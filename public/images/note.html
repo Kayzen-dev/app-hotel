@@ -1,0 +1,36 @@
+<div class="grid grid-cols-1 gap-6" x-data="kembalianComponent()" x-init="init()">
+    <div>
+        <label class="text-sm font-medium text-gray-600 dark:text-gray-300">Jumlah Pembayaran:</label>
+        <input type="text" id="jumlahPembayaran" wire:model.live="jumlahPembayaran" required x-model="jumlahPembayaran" @change="updateKembalian()" class="input input-bordered w-full text-lg" placeholder="Masukkan Jumlah Pembayaran">
+    </div>
+
+    <div>
+        <label class="text-sm font-medium text-gray-600 dark:text-gray-300">Total Harga Kamar:</label>
+        <div class="mt-2 text-lg font-semibold text-gray-800 dark:text-white">
+            Rp {{ number_format($total_harga, 0, ',', '.') }}
+        </div>
+    </div>
+    
+    <div>
+        <label class="text-sm font-medium text-gray-600 dark:text-gray-300">Kembalian:</label>
+        <div class="mt-2 text-lg font-semibold text-red-500">
+            <span x-text="formatRupiah(kembalian)"></span>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+   
+</script>
