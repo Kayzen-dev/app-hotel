@@ -3,12 +3,12 @@
 namespace App\Livewire\Reservasi;
 
 use Carbon\Carbon;
-use App\Models\Tamu;
 use Livewire\Component;
 use App\Models\Reservasi;
 use App\Models\Pembayaran;
 use App\Traits\WithSorting;
 use Livewire\WithPagination;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
 class ReservasiIndex extends Component
@@ -28,11 +28,16 @@ class ReservasiIndex extends Component
     public $persentase_kenaikan_harga;
     public $kamar;
     public $jumlahPembayaran;
+    public $IjumlahPembayaran;
     public $kembalian;
     public $user;
     public $denda;
+    public $Idenda;
     public $keterangan;
+    public $Iketerangan;
     public $jumlahHari;
+    public $bayarDenda = false;
+    public $bayarKedua;
 
 
     public $idTamu;
@@ -64,6 +69,7 @@ class ReservasiIndex extends Component
     public $showModalBatal = false;
     public $showModalCheckIn = false;
     public $showModalCheckOut = false;
+    public $showModalSelesai = false;
 
 
     public $pembayaran = false;
@@ -76,6 +82,8 @@ class ReservasiIndex extends Component
     public $pesanan = [];
     public $hargaDasarList = [];
     public $hargaAkhirList = [];
+    public $invoice = [];
+
 
 
     public function converDescimal($harga)
@@ -125,6 +133,8 @@ class ReservasiIndex extends Component
             $this->jumlahKamar = $resev->jumlah_kamar;
             $this->total_harga = $resev->total_harga;
             $this->denda = $resev->denda;
+
+            // dd($this->denda);
 
             if ($resev->status_reservasi == 'check_in') {
                 $this->status_reservasi = 'Check in';
@@ -185,53 +195,7 @@ class ReservasiIndex extends Component
         $this->showModalDetail = true;
     }
 
-    // public function invoice($id)
-    // {
-    //     $this->id = $id;
-    //     $resev = Reservasi::where('id', $id)
-    //         ->with('pesanan.diskon', 'pesanan.harga', 'tamu', 'pesanan.kamar.jenisKamar', 'pembayaran.user')
-    //         ->first();
-
-    //     // Validasi data tamu
-    //     if (!$resev || empty($resev->tamu->kota) || empty($resev->tamu->alamat) || empty($resev->tamu->no_identitas) || empty($resev->tamu->email)) {
-    //         $this->dispatch('notify', title: 'fail', message: 'Lengkapi data Tamu terlebih dahulu');
-    //         $this->showModalInvoice = false;
-    //         return;
-    //     }
-
-    //     if ($resev) {
-    //         $pesanan = $resev->pesanan->first();
-
-    //         $this->showModalInvoice = true;
-    //         $this->idTamu = $resev->tamu->id;
-    //         $this->namaTamu = $resev->tamu->nama;
-    //         $this->alamatTamu = $resev->tamu->alamat;
-    //         $this->kotaTamu = $resev->tamu->kota;
-    //         $this->emailTamu = $resev->tamu->email;
-    //         $this->teleponTamu = $resev->tamu->no_tlpn;
-
-    //         $this->invoiceNumber = 'INV' . str_pad($resev->tamu->id, 5, '0', STR_PAD_LEFT);
-    //         $this->invoiceDate = now()->format('d/m/Y');
-
-    //         $this->tipe_kamar = $pesanan->kamar->jenisKamar->tipe_kamar;
-    //         $this->jenis_ranjang = $pesanan->kamar->jenisKamar->jenis_ranjang;
-    //         $this->no_kamar = $pesanan->kamar->no_kamar;
-    //         $this->tanggal_check_in = $resev->tanggal_check_in;
-    //         $this->tanggal_check_out = $resev->tanggal_check_out;
-    //         $this->durasi = \Carbon\Carbon::parse($resev->tanggal_check_in)->diffInDays($resev->tanggal_check_out);
-    //         $this->harga_kamar = $pesanan->kamar->harga_kamar;
-    //         $this->total_harga = $resev->total_harga;
-    //         $this->status_reservasi = ucfirst($resev->status_reservasi);
-    //     } else {
-    //         $this->dispatch('notify', title: 'fail', message: 'Reservasi tidak ditemukan');
-    //         $this->showModalInvoice = false;
-    //     }
-    // }
-
-        // public function cetakInvoice() {
-        //     return Redirect()->route('resep.invoice',['idTamu' => $this->idTamu]);
-        // }
-
+ 
 
 
         public function checkIn($id) 
@@ -316,14 +280,114 @@ class ReservasiIndex extends Component
         }
 
 
+        public function INVOICE($id) 
+        {
+            Carbon::setLocale('id');
+    
+            $this->id = $id;
+    
+            $resev = Reservasi::where('id', $id)
+                ->with('pesanan.diskon', 'pesanan.harga', 'tamu', 'pesanan.kamar.jenisKamar', 'pembayaran.user')
+                ->first();
+
+                // dd($resev);
+    
+            if (!$resev->tamu || in_array('no-data', [$resev->tamu->kota, $resev->tamu->alamat, $resev->tamu->no_identitas, $resev->tamu->email])) {
+                $this->dispatch('notify', title: 'fail', message: 'Data Tamu Belum Lengkap!');
+                $this->showModalInvoice = false;
+                return;
+            }
+
+         
+            if ($resev) {
+    
+                $this->idTamu = $resev->tamu->id;
+                $this->namaTamu = $resev->tamu->nama;
+                $this->alamatTamu = $resev->tamu->alamat;
+                $this->kotaTamu = $resev->tamu->kota;
+                $this->emailTamu = $resev->tamu->email;
+                $this->teleponTamu = $resev->tamu->no_tlpn;
+                $this->invoiceNumber = 'INV' . str_pad($resev->tamu->id, 3, '0', STR_PAD_LEFT) . date('Ymd', strtotime($resev->tanggal_check_in));
+
+                $this->invoiceDate = $resev->tanggal_check_in;
+
+
+
+
+                
+                $this->jumlahKamar = $resev->jumlah_kamar;
+                $this->total_harga = $resev->total_harga;
+
+                $this->denda = $resev->denda;
+                if ($resev->status_reservasi == 'check_in') {
+                        $this->status_reservasi = 'Check in';
+                }elseif ($resev->status_reservasi == 'check_out') {
+                        $this->status_reservasi = 'Check out';
+                }else{
+                    $this->status_reservasi = $resev->status_reservasi;
+                }
+
+                if ($resev->status_reservasi == 'check_in') {
+
+                    $this->jumlahPembayaran = $resev->pembayaran->jumlah_pembayaran;
+                    $this->kembalian = $resev->pembayaran->kembalian;
+                    $this->user = $resev->pembayaran->user->username;
+
+                }elseif ($resev->status_reservasi == 'check_out') {
+                        $this->jumlahPembayaran = $resev->pembayaran->jumlah_pembayaran;
+                        $this->kembalian = $resev->pembayaran->kembalian;
+                        $this->user = $resev->pembayaran->user->username;
+                        $this->denda = $resev->denda;
+                }
+
+
+                
+    
+                $this->keterangan = $resev->keterangan;
+                $this->jumlahHari = \Carbon\Carbon::parse($resev->tanggal_check_in)->diffInDays($resev->tanggal_check_out);
+                
+                // dd($this->total_harga);
+    
+                // Mapping data pesanan ke array
+                $pesanan = $resev->pesanan->map(function ($item) {
+                    return [
+                        'jenisKamar' => $item['kamar']['jenisKamar']['tipe_kamar'] . ' - ' . $item['kamar']['jenisKamar']['jenis_ranjang'],
+                        'no_kamar' => $item['kamar']['no_kamar'],
+                        'harga_kamar' => $item['harga_kamar'],
+                        'harga_akhir' => $item['harga_akhir'],
+                        'jumlah_malam' => $item['jumlah_malam'],
+                        'subtotal' => $item['subtotal']
+                    ];
+                });
+                
+                $this->invoice = $pesanan;
+                
+
+            } else {
+                $this->dispatch('notify', title: 'fail', message: 'Reservasi tidak ditemukan');
+            }
+    
+            $this->showModalInvoice = true;
+
+        }
+
+
+        
+        public function cetakInvoice() {
+            return Redirect()->route('resep.invoice',['idRes' => $this->id]);
+        }
+
+
     
     
         public function submitCheckIn(){
             
-            $jumlahPembayaran = $this->converDescimal($this->jumlahPembayaran);
+            $jumlahPembayaran = $this->converDescimal($this->IjumlahPembayaran);
             // dd($jumlahPembayaran);
             $resev = Reservasi::find($this->id);
             // dd($resev);
+
+            // dd($jumlahPembayaran);
 
 
             if ($jumlahPembayaran == 0.00) {
@@ -349,14 +413,14 @@ class ReservasiIndex extends Component
                     'kembalian' => $this->kembalian
                 ]);
 
-                if ($pembayaran) {
+                if ($pembayaran && $this->showModalCheckIn) {
 
                     $res = Reservasi::find($this->id);
                     $res->update([
                         'status_reservasi' => 'check_in'
                     ]);
 
-                    is_null($pembayaran)
+                    is_null($res)
                     ? $this->dispatch('notify', title: 'fail', message: 'Check In dan Pembayaran gagal dilakukan')
                     : $this->dispatch('notify', title: 'success', message: 'Check In dan  Pembayaran berhasil dilakukan');
                     $this->showModalCheckIn = false;
@@ -434,7 +498,7 @@ class ReservasiIndex extends Component
     
     
     
-                $this->pembayaran = $resev->pembayaran ? true : false;
+                // $this->pembayaran = $resev->pembayaran ? true : false;
                 $this->jumlahPembayaran = $resev->pembayaran ? $resev->pembayaran->jumlah_pembayaran : null;
                 $this->kembalian = $resev->pembayaran ? $resev->pembayaran->kembalian : null;
                 $this->user = $resev->pembayaran ? $resev->pembayaran->user->username : null;
@@ -448,55 +512,25 @@ class ReservasiIndex extends Component
         }
 
 
-    
-    
+
+
+
+
         public function submitCheckOut(){
             
-            $jumlahPembayaran = $this->converDescimal($this->jumlahPembayaran);
-            // dd($jumlahPembayaran);
-            $resev = Reservasi::find($this->id);
-            // dd($resev);
+            $denda = (float) $this->converDescimal($this->Idenda);
+            $res = Reservasi::find($this->id);
 
+            $res->update([
+                'status_reservasi' => 'check_out',
+                'denda' => $denda,
+                'keterangan' => $this->Iketerangan
+            ]);
 
-            if ($jumlahPembayaran == 0.00) {
-                $this->dispatch('notify', title: 'fail', message: 'Jumlah Pembayaran Tidak Boleh Nol!');
-                return;
-            }elseif ($jumlahPembayaran < $resev->total_harga ) {
-                $this->dispatch('notify', title: 'fail', message: 'Jumlah Pembayaran yang dimasukan Kurang tidak boleh kurang ! ');
-                return;
-            }
-
-
-                    // Hitung kembalian
-                $kembalian = max(0, $this->toDecimal($jumlahPembayaran) - $this->total_harga);
-                
-                $this->kembalian = number_format((float) $kembalian, 2, '.', '');
-                // dd($this->kembalian);
-
-
-                $pembayaran = Pembayaran::create([
-                    'id_reservasi' => $this->id,
-                    'id_user' => Auth::id(),
-                    'jumlah_pembayaran' => $jumlahPembayaran,
-                    'kembalian' => $this->kembalian
-                ]);
-
-                if ($pembayaran) {
-
-                    $res = Reservasi::find($this->id);
-                    $res->update([
-                        'status_reservasi' => 'check_in'
-                    ]);
-
-                    is_null($pembayaran)
-                    ? $this->dispatch('notify', title: 'fail', message: 'Check In dan Pembayaran gagal dilakukan')
-                    : $this->dispatch('notify', title: 'success', message: 'Check In dan  Pembayaran berhasil dilakukan');
-                    $this->showModalCheckIn = false;
-                
-                }else{
-                    $this->dispatch('notify', title: 'fail', message: 'Pembayaran gagal!');
-                    $this->showModalCheckIn = false;
-                }
+            is_null($res)
+            ? $this->dispatch('notify', title: 'fail', message: 'Check Out gagal dilakukan')
+            : $this->dispatch('notify', title: 'success', message: 'Check out berhasil dilakukan');
+            $this->showModalCheckOut = false;
 
         }
 
@@ -541,30 +575,7 @@ class ReservasiIndex extends Component
 
 
 
-
-    public function delete($id) {
-        $this->id = $id;
-
-        $resev = Reservasi::where('id',$id)->first();
-        // dd($resev);
-        if ($resev) {
-            $this->no_reservasi = $resev->no_reservasi;
-        }else {
-            $this->dispatch('notify', title: 'fail', message: 'Reservasi tidak ditemukan');
-        }
-
-        $this->showModalDelete = true;
-    }
-
-
-    public function submitDelete(){
-        $delete = Reservasi::destroy($this->id);
-        is_null($delete)
-        ? $this->dispatch('notify', title: 'fail', message: 'Hapus reservasi gagal dilakukan')
-        : $this->dispatch('notify', title: 'success', message: 'Hapus reservasi berhasil dilakukan');
-        $this->showModalDelete = false;
-    }
-
+    
     public function batal($id) {
         $this->id = $id;
 
@@ -592,14 +603,44 @@ class ReservasiIndex extends Component
         : $this->dispatch('notify', title: 'success', message: 'Hapus reservasi berhasil dilakukan');
         $this->showModalBatal = false;
     }
+
+    public function selesai($id) {
+        $this->id = $id;
+
+        $resev = Reservasi::where('id',$id)->first();
+        // dd($resev);
+        if ($resev) {
+            $this->no_reservasi = $resev->no_reservasi;
+        }else {
+            $this->dispatch('notify', title: 'fail', message: 'Reservasi tidak ditemukan');
+        }
+
+        $this->showModalSelesai = true;
+    }
+
+
+    public function submitSelesai(){
+        $selesai = Reservasi::find($this->id)->update(
+            [
+                'status_reservasi' => 'selesai'
+            ]
+        );
+
+        is_null($selesai)
+        ? $this->dispatch('notify', title: 'fail', message: 'Reservasi gagal diselesaikan')
+        : $this->dispatch('notify', title: 'success', message: 'Reservasi berhasil diselesaikan');
+        $this->showModalSelesai = false;
+    }
     
     public function render()
     {
         return view('livewire..reservasi.reservasi-index',
         [
-            'data' => Reservasi::with('pesanan.kamar','tamu','pesanan.diskon','pesanan.harga','pembayaran')
+          'data' => Reservasi::with('pesanan.kamar','tamu','pesanan.diskon','pesanan.harga','pembayaran')
+            ->whereNotIn('status_reservasi', ['selesai', 'batal']) // Menambahkan filter status_reservasi
             ->orderBy($this->sortBy, $this->sortDirection)
             ->paginate($this->paginate),
+
         ]
     );
     }

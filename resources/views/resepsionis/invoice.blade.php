@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Invoice {{ $invoiceNumber }}</title>
+    <title>{{ $invoiceData['namaTamu'] }} - {{ $invoiceData['invoiceNumber'] }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @media print {
@@ -19,7 +19,6 @@
         };
 
         window.onafterprint = function() {
-            // Jika pengguna kembali ke halaman setelah pencetakan dibatalkan
             console.log("Pengguna selesai mencetak atau membatalkan");
         };
 
@@ -27,22 +26,17 @@
             console.log("Sedang mencetak...");
         };
 
-        // Memeriksa jika pengguna kembali ke halaman setelah batal mencetak
         window.addEventListener("focus", function() {
-            
         });
 
-
-        // setTimeout(() => {
-        //         // Arahkan ke halaman tamu jika pengguna kembali ke halaman setelah batal mencetak
-        //         window.location.href = "{{ route('resepsionis.tamu.index') }}";
-        //     }, 3000);
+        setTimeout(() => {
+            window.location.href = "{{ route('resepsionis.reservasi.data') }}";
+        }, 3000);
 
     </script>
 </head>
-<body class="bg-gray-100 p-4 h-screen flex items-center justify-center">
-
-    <div class="max-w-3xl mx-auto bg-white p-6 rounded-lg">
+<body class="bg-gray-100 p-4 min-h-screen flex justify-center items-start">
+    <div class="max-w-3xl bg-white p-6 rounded-lg">
         <div class="flex items-center justify-between mb-8">
             <div class="flex items-center">
                 <img class="h-20 w-20 mr-2" src="{{ asset('images/logo_hotel.png') }}" alt="Logo" />
@@ -50,8 +44,8 @@
             </div>
             <div class="text-gray-700 text-right">
                 <div class="font-bold text-xl mb-2">INVOICE</div>
-                <div class="text-sm">Tanggal: {{ $invoiceDate }}</div>
-                <div class="text-sm">Invoice #: {{ $invoiceNumber }}</div>
+                <div class="text-sm">Tanggal: {{ $invoiceData['invoiceDate'] }}</div>
+                <div class="text-sm">Invoice #: {{ $invoiceData['invoiceNumber'] }}</div>
             </div>
         </div>
     
@@ -67,10 +61,10 @@
             <div>
                 <h3 class="font-bold text-gray-700">Kepada:</h3>
                 <p class="text-gray-600 text-sm">
-                    {{ $namaTamu }}<br>
-                    {{ $alamatTamu }}, {{ $kotaTamu }}<br>
-                    {{ $emailTamu }}<br>
-                    No. Telepon: {{ $teleponTamu }}
+                    {{ $invoiceData['namaTamu'] }}<br>
+                    {{ $invoiceData['alamatTamu'] }}, {{ $invoiceData['kotaTamu'] }}<br>
+                    {{ $invoiceData['emailTamu'] }}<br>
+                    No. Telepon: {{ $invoiceData['teleponTamu'] }}
                 </p>
             </div>
         </div>
@@ -87,38 +81,90 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach ($reservasi as $item)
+                @foreach ($invoiceData['invoice'] as $item)
                 <tr class="text-center">
-                    <td class="p-2 text-gray-700">{{ $item['tipe_kamar'] }} - {{ $item['jenis_ranjang'] }}</td>
+                    <td class="p-2 text-gray-700">{{ $item['jenisKamar'] }}</td>
                     <td class="p-2 text-gray-700">{{ $item['no_kamar'] }}</td>
-                    <td class="p-2 text-gray-700">{{ $item['durasi'] }} Malam</td>
-                    <td class="p-2 text-gray-700">Rp{{ number_format($item['harga_kamar'], 0, ',', '.') }}</td>
-                    <td class="p-2 text-gray-700">Rp{{ number_format($item['total_harga'], 0, ',', '.') }}</td>
-                    <td class="p-2 text-gray-700">{{ $item['status'] == 'Check_in' ? 'Check In' : $item['status']  }}</td>
+                    <td class="p-2 text-gray-700">{{ $item['jumlah_malam'] }} Malam</td>
+                    <td class="p-2 text-gray-700">Rp {{ number_format($item['harga_akhir'], 0, ',', '.') }}</td>
+                    <td class="p-2 text-gray-700">Rp {{ number_format($item['subtotal'], 0, ',', '.') }}</td>
+                    <td class="p-2 text-gray-700">{{ $invoiceData['status_reservasi'] }}</td>
                 </tr>
                 @endforeach
             </tbody>
         </table>
-    
-        <div class="flex justify-end mt-6">
-            <table class="w-1/2 text-right">
-                <tr>
-                    <th class="p-2 text-gray-700">Subtotal:</th>
-                    <td class="p-2 text-gray-900 font-bold">Rp{{ number_format($totalHarga, 0, ',', '.') }}</td>
-                </tr>
-                {{-- <tr>
-                    <th class="p-2 text-gray-700">Pajak (10%):</th>
-                    <td class="p-2 text-gray-900 font-bold">Rp{{ number_format($totalHarga * 0.1, 0, ',', '.') }}</td>
-                </tr> --}}
-                <tr>
-                    <th class="p-2 text-gray-900 text-lg">Total:</th>
-                    {{-- <td class="p-2 text-red-600 text-lg font-bold">Rp{{ number_format($totalHarga * 1.1, 0, ',', '.') }}</td> --}}
-                    <td class="p-2 text-red-600 text-lg font-bold">Rp{{ number_format($totalHarga, 0, ',', '.') }}</td>
-                </tr>
-            </table>
+        
+        <div class="flex justify-between mt-6 gap-8">
+            <!-- Bagian Kiri: Informasi Kamar & Pembayaran -->
+            <div class="flex-1">
+                <table class="w-full">
+                    @if ($invoiceData['status_reservasi'] == "Check in")
+                        <tr>
+                            <th class="p-2 text-gray-600 text-sm font-normal w-1/2">Total Kamar:</th>
+                            <td class="p-2 text-gray-900 font-semibold text-right">{{ $invoiceData['jumlahKamar']}}</td>
+                        </tr>
+                        <tr>
+                            <th class="p-2 text-gray-600 text-sm font-normal">Jumlah Pembayaran:</th>
+                            <td class="p-2 text-gray-900 font-semibold text-right">Rp {{ number_format($invoiceData['jumlahPembayaran'], 0, ',', '.') }}</td>
+                        </tr>
+                        <tr>
+                            <th class="p-2 text-gray-600 text-sm font-normal">Kembalian:</th>
+                            <td class="p-2 text-gray-900 font-semibold text-right">Rp {{ number_format($invoiceData['kembalian'], 0, ',', '.') }}</td>
+                        </tr>
+                    @elseif ($invoiceData['status_reservasi'] == "Check out")
+                        <tr>
+                            <th class="p-2 text-gray-600 text-sm font-normal w-1/2">Total Kamar:</th>
+                            <td class="p-2 text-gray-900 font-semibold text-right">{{ $invoiceData['jumlahKamar']}}</td>
+                        </tr>
+                        <tr>
+                            <th class="p-2 text-gray-600 text-sm font-normal">Jumlah Pembayaran:</th>
+                            <td class="p-2 text-gray-900 font-semibold text-right">Rp {{ number_format($invoiceData['jumlahPembayaran'], 0, ',', '.') }}</td>
+                        </tr>
+                        <tr>
+                            <th class="p-2 text-gray-600 text-sm font-normal">Kembalian:</th>
+                            <td class="p-2 text-gray-900 font-semibold text-right">Rp {{ number_format($invoiceData['kembalian'], 0, ',', '.') }}</td>
+                        </tr>
+                    @else
+                        <tr>
+                            <th class="p-2 text-gray-600 text-sm font-normal w-1/2">Total Kamar:</th>
+                            <td class="p-2 text-gray-900 font-semibold text-right">{{ $invoiceData['jumlahKamar']}}</td>
+                        </tr>
+                        
+                    @endif
+                </table>
+            </div>
+        
+            <!-- Garis Pemisah Vertikal -->
+            <div class="border-r border-gray-200 h-auto my-2"></div>
+        
+            <!-- Bagian Kanan: Total & Denda -->
+            <div class="flex-1">
+                <table class="w-full">
+                    @if ($invoiceData['status_reservasi'] == "Check in")
+                        <tr class="border-t border-gray-200">
+                            <th class="p-2 text-gray-900 font-bold pt-3">Total:</th>
+                            <td class="p-2 text-red-600 font-bold text-right pt-3">Rp {{ number_format($invoiceData['total_harga'], 0, ',', '.') }}</td>
+                        </tr>
+                    @elseif ($invoiceData['status_reservasi'] == "Check out")
+                        <tr>
+                           
+                            <th class="p-2 text-gray-900 font-bold pt-3">Total:</th>
+                            <td class="p-2 text-red-600 font-bold text-right pt-3">Rp {{ number_format($invoiceData['total_harga'], 0, ',', '.') }}</td>
+                        </tr>
+                        <tr class="border-t border-gray-200">
+                            <th class="p-2 text-gray-600 text-sm font-normal">Denda:</th>
+                            <td class="p-2 text-gray-900 font-semibold text-right">Rp {{ number_format($invoiceData['denda'], 0, ',', '.') }}</td>
+                        </tr>
+                    @else
+                    <tr class="border-t border-gray-200">
+                        <th class="p-2 text-gray-900 font-bold pt-3">Total:</th>
+                        <td class="p-2 text-red-600 font-bold text-right pt-3">Rp {{ number_format($invoiceData['total_harga'], 0, ',', '.') }}</td>
+                    </tr>
+                    @endif
+                </table>
+            </div>
         </div>
     
     </div>
-
 </body>
 </html>

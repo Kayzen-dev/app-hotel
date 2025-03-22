@@ -1,7 +1,7 @@
 <div wire:poll>
     
     <div x-data="ketersediaan()" class="dropdown" x-init="init()">
-        <div tabindex="0" role="button" class="btn m-3">Ketersediaan Kamarccc</div>
+        <div tabindex="0" role="button" class="btn m-3">Ketersediaan Kamar</div>
         <div tabindex="0" class="dropdown-content card card-compact bg-neutral text-gray-300 z-[1] w-[600px] p-2 shadow">
             <div class="card-body p-3">
                 <div class="flex space-x-5 mb-1">

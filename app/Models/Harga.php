@@ -23,7 +23,7 @@ class Harga extends Model
 
     public function pesanan()
     {
-        return $this->hasMany(Pesanan::class, 'id_diskon');
+        return $this->hasMany(Pesanan::class, 'id_harga');
     }
 
     public function jenisKamar()

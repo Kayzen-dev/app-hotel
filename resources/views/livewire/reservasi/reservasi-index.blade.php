@@ -51,7 +51,7 @@
                 <td class="text-center">
                     <button class="btn btn-primary btn-sm" wire:click="detail({{ $item->id }})">Detail</button>
                     @if ($item->status_reservasi != 'batal')
-                        <button class="btn btn-primary btn-sm" wire:click="invoice({{ $item->id }})">Invoice</button>  
+                        <buttton class="btn btn-sm btn-primary" wire:click="INVOICE({{ $item->id }})">Invoice</buttton>
                     @endif
 
                     @if ($item->status_reservasi == 'dipesan')
@@ -62,7 +62,6 @@
                     @elseif ($item->status_reservasi == 'check_out')
                     <buttton class="btn btn-sm btn-primary" wire:click="selesai({{ $item->id }})">Selesaikan</buttton>
                     @endif
-                    <button class="btn btn-neutral btn-sm" wire:click="delete({{ $item->id }})">Hapus</button>
 
                 </td>
                 
@@ -85,31 +84,6 @@
 
 
                         <div>
-                            <x-dialog-modal wire:model.live="showModalDelete"> 
-                                <x-slot name="title">
-                                    Hapus Data Reservasi
-                                </x-slot>
-                            
-                                <x-slot name="content">
-                                    <p>Apakah anda yakin ingin menghapus reservasi dengan ID: {{ $id }} dan dengan nomor reservasi {{ $no_reservasi }}</p>
-                                </x-slot>
-                            
-                                <x-slot name="footer">
-                                    <div class="flex justify-end gap-3 mt-5">
-                                        <x-secondary-button @click="$wire.set('showModalDelete', false)" >
-                                            Batal
-                                         </x-secondary-button>
-                                 
-                                         <button class="btn btn-primary ml-2"  @click="$wire.submitDelete()" >
-                                             Hapus
-                                         </button>
-                                    </div>
-                                   
-                                </x-slot>
-                            </x-dialog-modal>
-                        </div>
-
-                        <div>
                             <x-dialog-modal wire:model.live="showModalBatal"> 
                                 <x-slot name="title">
                                     Batalkan Data Reservasi
@@ -127,6 +101,31 @@
                                  
                                          <button class="btn btn-primary ml-2"  @click="$wire.submitBatal()" >
                                              Batalkan
+                                         </button>
+                                    </div>
+                                   
+                                </x-slot>
+                            </x-dialog-modal>
+                        </div>
+                        
+                        <div>
+                            <x-dialog-modal wire:model.live="showModalSelesai"> 
+                                <x-slot name="title">
+                                    Batalkan Data Reservasi
+                                </x-slot>
+                            
+                                <x-slot name="content">
+                                    <p>Apakah anda yakin ingin menyelesaikan reservasi dengan ID: {{ $id }} dan dengan nomor reservasi {{ $no_reservasi }}</p>
+                                </x-slot>
+                            
+                                <x-slot name="footer">
+                                    <div class="flex justify-end gap-3 mt-5">
+                                        <x-secondary-button @click="$wire.set('showModalSelesai', false)" >
+                                            Batal
+                                         </x-secondary-button>
+                                 
+                                         <button class="btn btn-primary ml-2"  @click="$wire.submitSelesai()" >
+                                             Selesaikan
                                          </button>
                                     </div>
                                    
@@ -166,8 +165,8 @@
                                                 </div>
                                             </div>
                                             <span class="px-3 py-1 text-sm font-semibold rounded-full 
-                                                      {{ $status_reservasi == 'Selesai' ? 'bg-green-100 text-green-800' : 
-                                                         ($status_reservasi == 'batal' ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800') }}">
+                                                      {{ $status_reservasi == 'Check In' ? 'bg-green-100 text-green-900' : 
+                                                         ($status_reservasi == 'Check Out' ? 'bg-green-100 text-green-900' : 'bg-blue-100 text-blue-800') }}">
                                                 {{ $status_reservasi }}
                                             </span>
                                         </div>
@@ -236,8 +235,8 @@
                                                         </div>
 
                                                         <span class="px-3 py-1 text-sm font-semibold rounded-full 
-                                                        {{ $status_reservasi == 'Selesai' ? 'bg-green-100 text-green-800' : 
-                                                                        ($status_reservasi == 'batal' ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800') }}">
+                                                        {{ $status_reservasi == 'Check In' ? 'bg-green-100 text-green-900' : 
+                                                         ($status_reservasi == 'Check Out' ? 'bg-green-100 text-green-900' : 'bg-blue-100 text-blue-800') }}">
                                                                 {{ $status_reservasi }}
                                                             </span>
                                                     </div>
@@ -313,7 +312,7 @@
                                         <!-- Right Column - Payment Summary -->
                                         <div class="space-y-4">
                                             <div class="bg-white p-4 rounded-xl border border-gray-100">
-                                                <h4 class="text-sm font-semibold text-gray-600 mb-3">Jumlah Pembayaran</h4>
+                                                <h4 class="text-sm font-semibold text-gray-600 mb-3">Detail Pembayaran</h4>
                                                 <div class="space-y-4">
                                             
                                                     <!-- Menampilkan Harga Awal -->
@@ -367,7 +366,7 @@
                                                             </span>
                                                         </div>
                                                 
-                                                        @if ($denda != null)
+                                                        @if ($denda != "0.00")
                                                             <div class="flex justify-between">
                                                                 <span class="text-sm text-gray-600">Denda</span>
                                                                 <span class="text-sm font-medium text-gray-900">
@@ -375,12 +374,13 @@
                                                                 </span>
                                                             </div>
                                                         @endif
+                                                        
                                                     <!-- Total Pembayaran -->
                                                     <div class="pt-2 border-t border-gray-100">
                                                         <div class="flex justify-between">
                                                             <span class="text-sm font-semibold text-gray-700">Total</span>
                                                             <span class="text-sm font-semibold text-blue-600">
-                                                                Rp {{ number_format($total_harga + $denda, 0, ',', '.') }}
+                                                                Rp {{ number_format($total_harga, 0, ',', '.') }}
                                                             </span>
                                                         </div>
                                                     </div>
@@ -458,6 +458,207 @@
                                 </div>
                             </x-slot>
                         </x-dialog>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                        <x-dialog wire:model="showModalInvoice" maxWidth="2xl">
+                            <x-slot name="title">
+                                <div class="flex items-center gap-3 px-6 pt-4">
+                                    <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                              d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                                    </svg>
+                                    <h2 class="text-xl font-bold text-gray-900">Invoice #{{ $invoiceNumber }}</h2>
+                                </div>
+                            </x-slot>
+                        
+                            <x-slot name="content">
+                                <div class="space-y-6 px-6 pb-4">
+                                    <!-- Header Info -->
+                                    <div class="p-4 rounded-xl">
+                                        <div class="max-w-3xl mx-auto bg-white p-6 rounded-lg">
+                                            <div class="flex items-center justify-between mb-8">
+                                                <div class="flex items-center">
+                                                    <img class="h-20 w-20 mr-2" src="{{ asset('images/logo_hotel.png') }}" alt="Logo" />
+                                                    <div class="text-gray-700 font-semibold text-lg">Hotel Crown Pangandaran Syariah</div>
+                                                </div>
+                                                <div class="text-gray-700 text-right">
+                                                    <div class="font-bold text-xl mb-2">INVOICE</div>
+                                                    <div class="text-sm">Tanggal: {{ $invoiceDate }}</div>
+                                                    <div class="text-sm">Invoice #: {{ $invoiceNumber }}</div>
+                                                </div>
+                                            </div>
+                                        
+                                            <div class="grid grid-cols-2 gap-4 mb-6">
+                                                <div>
+                                                    <h3 class="font-bold text-gray-700">Hotel Crown Pangandaran Syariah</h3>
+                                                    <p class="text-gray-600 text-sm">
+                                                        Jl. Pangandaran No. 10, Jawa Barat<br>
+                                                        Email: crownhotelpangandaran1@gmail.com<br>
+                                                        Telp: (0858) 05362620
+                                                    </p>
+                                                </div>
+                                                <div>
+                                                    <h3 class="font-bold text-gray-700">Kepada:</h3>
+                                                    <p class="text-gray-600 text-sm">
+                                                        {{ $namaTamu }}<br>
+                                                        {{ $alamatTamu }}, {{ $kotaTamu }}<br>
+                                                        {{ $emailTamu }}<br>
+                                                        No. Telepon: {{ $teleponTamu }}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        
+                                            <table class="w-full border-collapse">
+                                                <thead>
+                                                    <tr class="bg-gray-200">
+                                                        <th class="p-2 text-gray-700">Kamar</th>
+                                                        <th class="p-2 text-gray-700">No. Kamar</th>
+                                                        <th class="p-2 text-gray-700">Durasi</th>
+                                                        <th class="p-2 text-gray-700">Harga/Malam</th>
+                                                        <th class="p-2 text-gray-700">Total</th>
+                                                        <th class="p-2 text-gray-700">Status</th>
+                                                        
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach ($invoice as $item)
+                                                        <tr class="text-center">
+                                                            <td class="p-2 text-gray-700">{{ $item['jenisKamar'] }}</td>
+                                                            <td class="p-2 text-gray-700">{{ $item['no_kamar'] }}</td>
+                                                            <td class="p-2 text-gray-700">{{ $item['jumlah_malam'] }} Malam</td>
+                                                            <td class="p-2 text-gray-700">Rp {{ number_format($item['harga_akhir'], 0, ',', '.') }}</td>
+                                                            <td class="p-2 text-gray-700">Rp {{ number_format($item['subtotal'], 0, ',', '.') }}</td>
+                                                            <td class="p-2 text-gray-700">{{ $status_reservasi }}</td>
+                                                        </tr>
+                                                    @endforeach
+                                                </tbody>
+                                            </table>
+                                        
+
+
+
+                                            <div class="flex justify-between mt-6 gap-8">
+                                                <!-- Bagian Kiri: Informasi Kamar & Pembayaran -->
+                                                <div class="flex-1">
+                                                    <table class="w-full">
+                                                        @if ($status_reservasi == "Check in")
+                                                            <tr>
+                                                                <th class="p-2 text-gray-600 text-sm font-normal w-1/2">Total Kamar:</th>
+                                                                <td class="p-2 text-gray-900 font-semibold text-right">{{ $jumlahKamar }}</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <th class="p-2 text-gray-600 text-sm font-normal">Jumlah Pembayaran:</th>
+                                                                <td class="p-2 text-gray-900 font-semibold text-right">Rp {{ number_format($jumlahPembayaran, 0, ',', '.') }}</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <th class="p-2 text-gray-600 text-sm font-normal">Kembalian:</th>
+                                                                <td class="p-2 text-gray-900 font-semibold text-right">Rp {{ number_format($kembalian, 0, ',', '.') }}</td>
+                                                            </tr>
+                                                        @elseif ($status_reservasi == "Check out")
+                                                            <tr>
+                                                                <th class="p-2 text-gray-600 text-sm font-normal w-1/2">Total Kamar:</th>
+                                                                <td class="p-2 text-gray-900 font-semibold text-right">{{ $jumlahKamar}}</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <th class="p-2 text-gray-600 text-sm font-normal">Jumlah Pembayaran:</th>
+                                                                <td class="p-2 text-gray-900 font-semibold text-right">Rp {{ number_format($jumlahPembayaran, 0, ',', '.') }}</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <th class="p-2 text-gray-600 text-sm font-normal">Kembalian:</th>
+                                                                <td class="p-2 text-gray-900 font-semibold text-right">Rp {{ number_format($kembalian, 0, ',', '.') }}</td>
+                                                            </tr>
+                                                        @else
+                                                            <tr>
+                                                                <th class="p-2 text-gray-600 text-sm font-normal w-1/2">Total Kamar:</th>
+                                                                <td class="p-2 text-gray-900 font-semibold text-right">{{ $jumlahKamar}}</td>
+                                                            </tr>
+                                                            
+                                                        @endif
+                                                    </table>
+                                                </div>
+                                            
+                                                <!-- Garis Pemisah Vertikal -->
+                                                <div class="border-r border-gray-200 h-auto my-2"></div>
+                                            
+                                                <!-- Bagian Kanan: Total & Denda -->
+                                                <div class="flex-1">
+                                                    <table class="w-full">
+                                                        @if ($status_reservasi == "Check in")
+                                                            <tr class="border-t border-gray-200">
+                                                                <th class="p-2 text-gray-900 font-bold pt-3">Total:</th>
+                                                                <td class="p-2 text-red-600 font-bold text-right pt-3">Rp {{ number_format($total_harga, 0, ',', '.') }}</td>
+                                                            </tr>
+                                                        @elseif ($status_reservasi == "Check out")
+                                                            <tr>
+                                                                <th class="p-2 text-gray-900 font-bold pt-3">Total:</th>
+                                                                <td class="p-2 text-red-600 font-bold text-right pt-3">Rp {{ number_format($total_harga, 0, ',', '.') }}</td>
+                                                            </tr>
+                                                            <tr class="border-t border-gray-200">
+                                                                <th class="p-2 text-gray-600 text-sm font-normal">Denda:</th>
+                                                                <td class="p-2 text-gray-900 font-semibold text-right">Rp {{ number_format($denda, 0, ',', '.') }}</td>
+                                                            </tr>
+                                                        @else
+                                                            <tr class="border-t border-gray-200">
+                                                                <th class="p-2 text-gray-900 font-bold pt-3">Total:</th>
+                                                                <td class="p-2 text-red-600 font-bold text-right pt-3">Rp {{ number_format($total_harga, 0, ',', '.') }}</td>
+                                                            </tr>
+                                                        @endif
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        
+
+
+
+
+
+
+                                        
+                                        </div>
+
+                                    </div>
+                        
+                                </div>
+                            </x-slot>
+                        
+                            <x-slot name="footer">
+                                <div class="flex justify-end">
+                                    <button wire:click="$set('showModalInvoice', false)" style="margin-right: 20px;"
+                                            class="px-3 py-3 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 
+                                                   focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                                        Tutup
+                                    </button>
+
+                                    <button wire:click="cetakInvoice()" 
+                                            class="px-3 py-3 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 
+                                                   focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                                        Cetak
+                                    </button>
+                                </div>
+                            </x-slot>
+                        </x-dialog>
+
+
+
+
 
 
 
@@ -693,7 +894,7 @@
                                                         <div class="grid grid-cols-1">
                                                             <div>
                                                                 <label class="text-sm font-medium text-gray-600 text-gray-600">Jumlah Pembayaran:</label>
-                                                                <input type="text" id="jumlahPembayaran" wire:model.live="jumlahPembayaran" required x-model="jumlahPembayaran" @change="updateKembalian()" class="input input-bordered w-full text-md btn-md" placeholder="Masukkan Jumlah Pembayaran">
+                                                                <input type="text" id="jumlahPembayaran" wire:model.live="IjumlahPembayaran" required x-model="jumlahPembayaran" @change="updateKembalian()" class="input input-bordered w-full text-md btn-md" placeholder="Masukkan Jumlah Pembayaran">
                                                             </div>
                                                        
                                                         </div>
@@ -745,7 +946,7 @@
 
 
 
-                        <x-dialog wire:model="showModalCheckOut" submit="submitCheckOut"  maxWidth="2xl">
+                        <x-dialog wire:model="showModalCheckOut" submit="submitCheckOut" maxWidth="2xl">
                             <x-slot name="title">
                                 <div class="flex items-center gap-3 px-6 pt-4">
                                     <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -973,7 +1174,6 @@
                                             </div>
                                             
 
-                                            @if ($pembayaran)
                                             <div class="bg-white p-4 rounded-xl border border-gray-100">
                                                 <h4 class="text-sm font-semibold text-gray-500 mb-3">Detail Pembayaran</h4>
                                                 <div class="space-y-3">
@@ -1003,7 +1203,6 @@
                                                 </div>
                                             </div>
 
-                                        @endif
                                             
                                             
                                     
@@ -1012,6 +1211,40 @@
 
                                         </div>
                                     </div>
+
+
+
+
+                                    <div class="bg-blue-50 p-4 rounded-xl border border-blue-100">
+                                        <div class="flex items-center gap-4">
+                                            <!-- Input Denda -->
+                                            <div class="flex-1">
+                                                <label for="denda" class="block text-sm font-medium text-gray-700 mb-2">Denda</label>
+                                                <input id="Idenda" type="text" wire:model="Idenda" class="input input-bordered w-full text-md btn-md" placeholder="(Opsional) Masukkan jumlah denda">
+                                            </div>
+                                    
+                                            <!-- Input Keterangan -->
+                                            <div class="flex-1">
+                                                <label for="keterangan" class="block text-sm font-medium text-gray-700 mb-2">Keterangan</label>
+                                                <textarea id="keterangan" class="textarea textarea-bordered w-full text-md btn-md" placeholder="Masukkan keterangan" wire:model="Iketerangan" cols="1" rows="1"></textarea>
+                                            </div>
+                                    
+                                            <!-- Tombol Checkout -->
+                                            <div>
+                                                <button type="submit" class="w-full mt-4  bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition duration-200">
+                                                    Checkout
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+
+
+
+
+                                    
+                                    
                         
 
                                 </div>
@@ -1020,9 +1253,9 @@
 
                             <x-slot name="footer">
                                 <div class="px-6 pb-4 flex justify-end">
-                                    <button wire:click="$set('showModalCheckOut', false)" 
-                                            class="px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 
-                                                   focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                                    <button type="button" wire:click="$set('showModalCheckOut', false)" 
+                                            class="px-4 py-4 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 
+                                                focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
                                         Tutup
                                     </button>
                                 </div>
@@ -1047,10 +1280,17 @@
             this.value = formatRupiah ? "Rp " + formatRupiah : "";
         });
     
+        document.getElementById("Idenda").addEventListener("input", function () {
+                    let angka = this.value.replace(/\D/g, ""); // Hapus semua karakter non-angka
+                    let formatRupiah = new Intl.NumberFormat("id-ID").format(angka); // Format ke Rupiah
+                    this.value = formatRupiah ? "Rp " + formatRupiah : "";
+        });
+
+
         function kembalianComponent() {
             return {
                 totalHarga: @entangle('total_harga'),
-                jumlahPembayaran: @entangle('jumlahPembayaran'),
+                jumlahPembayaran: @entangle('IjumlahPembayaran'),
                 kembalian: 0,
     
                 formatRupiah(angka) {
@@ -1074,4 +1314,5 @@
         }
     
     </script>
+
 </div>

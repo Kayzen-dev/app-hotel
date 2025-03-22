@@ -24,6 +24,7 @@ class Diskon extends Model
     /**
      * Relasi dengan model Reservasi
      */
+    
     public function pesanan()
     {
         return $this->hasMany(Pesanan::class, 'id_diskon');

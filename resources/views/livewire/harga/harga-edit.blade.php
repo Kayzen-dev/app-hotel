@@ -105,14 +105,14 @@ function harga() {
 
                     // Validasi jika tanggal berakhir tidak lebih besar dari tanggal mulai
                     if (checkOut <= checkIn) {
-                        alert("Tanggal Berakhir Diskon harus lebih besar dari Tanggal Mulai!");
+                        alert("Tanggal Berakhir harga harus lebih besar dari Tanggal Mulai!");
                         this.tanggalBerakhir = ''; // Reset tanggal berakhir jika validasi gagal
                     }
                 }
             },
             // Mengambil daftar jenis kamar dari API/Server
             fetchJenisKamarList() {
-                fetch('/resepsionis/jenis-kamar/harga') // Ganti dengan endpoint API yang sesuai
+                fetch(`/resepsionis/jenis-kamar/harga/${this.tanggalMulai}/${this.tanggalBerakhir}`) // Ganti dengan endpoint API yang sesuai
                     .then(response => response.json())
                     .then(data => {
                         this.jenisKamarList = data;
