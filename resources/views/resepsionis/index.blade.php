@@ -1,92 +1,159 @@
 <x-app-layout>
-        @if(session('success'))
-        <x-slot name="header">
-            <div id="success-message" class="px-4 py-3 rounded mb-4">
-                <div role="alert" class="alert alert-success">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0 stroke-current" fill="none" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
+    @php
+        \Carbon\Carbon::setLocale('id');
+    @endphp
+ 
+
+
+    <div class="py-6">
+        {{-- <h2 class="text-xl font-semibold leading-tight text-gray-800">
+            Dashboard Resepsioniss - {{ now()->translatedFormat('l, d F Y') }}
+        </h2>
+     --}}
+        <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
+            <!-- Notifikasi -->
+            @if(session('success'))
+            <div class="p-4 mb-6 bg-green-100 rounded-lg" x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 3000)">
+                <div class="flex items-center space-x-2 text-green-700">
+                    <x-icons.check-circle class="w-5 h-5" />
                     <span>{{ session('success') }}</span>
                 </div>
             </div>
-        </x-slot>
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                setTimeout(function () {
-                    const successMessage = document.getElementById('success-message');
-                    if (successMessage) {
-                        successMessage.style.display = 'none';
-                    }
-                }, 3000); // 3000ms = 3 detik
-            });
-        </script>
-        @endif
+            @endif
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 px-4 py-8">
-                    <div class="flex flex-col justify-center items-center gap-2 border border-dashed border-gray-500 p-4 rounded-md h-32">
-                        <div class="flex gap-2 items-center">
-                            <span class="font-bold text-4xl">{{ $totalKamar }}</span>
-                            <svg class="w-8 h-8 opacity-70" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M4 12h16M5 14h14M6 16h12M7 18h10" />
-                            </svg>
+            <!-- Grid Statistik -->
+            <div class="grid grid-cols-1 gap-6 mb-8 md:grid-cols-2 lg:grid-cols-4">
+                <!-- Kamar Tersedia -->
+                <div class="p-6 bg-white rounded-lg shadow-sm">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-500">Kamar Tersedia</p>
+                            <p class="mt-2 text-3xl font-semibold text-emerald-600">{{ $kamarTersedia }}</p>
                         </div>
-                        <span class="font-semibold opacity-70 text-sm text-center">Total Kamar</span>
-                    </div>
-                
-                    <div class="flex flex-col justify-center items-center gap-2 border border-dashed border-gray-500 p-4 rounded-md h-32">
-                        <div class="flex gap-2 items-center">
-                            <span class="font-bold text-4xl">{{ $totalReservasi }}</span>
-                            <svg class="w-8 h-8 opacity-70" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 6h18M3 10h18M3 14h18M3 18h18" />
-                            </svg>
-                        </div>
-                        <span class="font-semibold opacity-70 text-sm text-center">Total Reservasi</span>
-                    </div>
-                
-                    <div class="flex flex-col justify-center items-center gap-2 border border-dashed border-gray-500 p-4 rounded-md h-32">
-                        <div class="flex gap-2 items-center">
-                            <span class="font-bold text-4xl">{{ $kamarDipesan }}</span>
-                            <svg class="w-8 h-8 opacity-70" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 9h18M3 12h18M3 15h18M3 18h18" />
-                            </svg>
-                        </div>
-                        <span class="font-semibold opacity-70 text-sm text-center">Kamar Dipesan</span>
-                    </div>
-                
-                    <div class="flex flex-col justify-center items-center gap-2 border border-dashed border-gray-500 p-4 rounded-md h-32">
-                        <div class="flex gap-2 items-center">
-                            <span class="font-bold text-4xl">{{ $kamarTersedia }}</span>
-                            <svg class="w-8 h-8 opacity-70" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 7h18M3 10h18M3 13h18M3 16h18" />
-                            </svg>
-                        </div>
-                        <span class="font-semibold opacity-70 text-sm text-center">Kamar Tersedia</span>
+                        <x-icons.bed class="w-12 h-12 text-emerald-100" />
                     </div>
                 </div>
 
-
-
-
-                {{-- <div class="flex flex-col md:flex-row gap-4 p-4 h-screen">
-                    <!-- Kiri (Dua Baris Div dengan Tinggi Setengah dari Kolom Kanan) -->
-                    <div class="flex flex-col justify-between w-full md:w-2/3">
-                        <div class="bg-blue-500 text-white p-6 rounded-lg shadow-lg h-1/2">Baris 1</div>
-                        <div class="h-4"></div> <!-- Jarak antara Baris 1 dan Baris 2 -->
-                        <div class="bg-green-500 text-white p-6 rounded-lg shadow-lg h-1/2">Baris 2</div>
+                <!-- Reservasi Hari Ini -->
+                <div class="p-6 bg-white rounded-lg shadow-sm">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-500">Reservasi Hari Ini</p>
+                            <p class="mt-2 text-3xl font-semibold text-blue-600">{{ $reservasiHariIni }}</p>
+                        </div>
+                        <x-icons.calendar class="w-12 h-12 text-blue-100" />
                     </div>
-                
-                    <!-- Kanan (Kolom Penuh) -->
-                    <div class="bg-gray-800 text-white p-6 rounded-lg shadow-lg w-full md:w-1/3 flex items-center justify-center">
-                        Kolom Kanan
+                </div>
+
+                <!-- Tamu Check-in -->
+                <div class="p-6 bg-white rounded-lg shadow-sm">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-500">Tamu Check-in</p>
+                            <p class="mt-2 text-3xl font-semibold text-purple-600">{{ $tamuCheckIn }}</p>
+                        </div>
+                        <x-icons.users class="w-12 h-12 text-purple-100" />
                     </div>
-                </div> --}}
-                
-                
+                </div>
+
+                <!-- Pendapatan Hari Ini -->
+                <div class="p-6 bg-white rounded-lg shadow-sm">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-500">Pendapatan Hari Ini</p>
+                            <p class="mt-2 text-3xl font-semibold text-rose-600">Rp {{ number_format($totalPendapatanHariIni, 0, ',', '.') }}</p>
+                        </div>
+                        <x-icons.cash class="w-12 h-12 text-rose-100" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Grid Konten Utama -->
+            <div class="grid gap-6 lg:grid-cols-3">
+                <!-- Reservasi Terbaru -->
+                <div class="lg:col-span-2">
+                    <div class="bg-white rounded-lg shadow-sm">
+                        <div class="px-6 py-4 border-b border-gray-200">
+                            <h3 class="text-lg font-semibold">Reservasi Terbaru</h3>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500">No. Reservasi</th>
+                                        <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500">Nama Tamu</th>
+                                        <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500">Check-in</th>
+                                        <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                    @foreach($reservasiTerbaru as $reservasi)
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ $reservasi->no_reservasi }}</td>
+                                        <td class="px-6 py-4 text-sm text-gray-500">{{ $reservasi->tamu->nama }}</td>
+                                        <td class="px-6 py-4 text-sm text-gray-500">
+                                            {{ \Carbon\Carbon::parse($reservasi->tanggal_check_in)->translatedFormat('d M Y') }}
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <span class="px-2 py-1 text-xs font-semibold rounded-full 
+                                                {{ $reservasi->status_reservasi === 'dipesan' ? 'bg-blue-100 text-blue-800' : 
+                                                   ($reservasi->status_reservasi === 'check_in' ? 'bg-green-100 text-green-800' : 
+                                                   'bg-gray-100 text-gray-800') }}">
+                                                {{ ucfirst($reservasi->status_reservasi) }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Aktivitas Terkini -->
+                <div class="bg-white rounded-lg shadow-sm">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <h3 class="text-lg font-semibold">Aktivitas Terkini</h3>
+                    </div>
+                    <div class="p-4 space-y-4">
+                        <!-- Kamar dalam Perbaikan -->
+                        <div class="flex items-start p-3 bg-orange-50 rounded-lg">
+                            <x-icons.tools class="flex-shrink-0 w-5 h-5 mt-1 text-orange-600" />
+                            <div class="ml-3">
+                                <p class="text-sm font-medium text-orange-800">{{ $kamarPerbaikan }} Kamar</p>
+                                <p class="text-xs text-orange-700">Sedang dalam perbaikan</p>
+                            </div>
+                        </div>
+
+                        <!-- Diskon Aktif -->
+                        <div class="flex items-start p-3 bg-purple-50 rounded-lg">
+                            <x-icons.tag class="flex-shrink-0 w-5 h-5 mt-1 text-purple-600" />
+                            <div class="ml-3">
+                                <p class="text-sm font-medium text-purple-800">{{ $totalDiskonAktif }} Diskon</p>
+                                <p class="text-xs text-purple-700">Promo aktif saat ini</p>
+                            </div>
+                        </div>
+
+                        <!-- Keluhan Aktif -->
+                        <div class="flex items-start p-3 bg-red-50 rounded-lg">
+                            <x-icons.alert-circle class="flex-shrink-0 w-5 h-5 mt-1 text-red-600" />
+                            <div class="ml-3">
+                                <p class="text-sm font-medium text-red-800">{{ $keluhanAktif->count() }} Keluhan</p>
+                                <p class="text-xs text-red-700">Memerlukan penanganan</p>
+                            </div>
+                        </div>
+
+                        <!-- Tingkat Okupansi -->
+                        <div class="flex items-start p-3 bg-blue-50 rounded-lg">
+                            <x-icons.chart-bar class="flex-shrink-0 w-5 h-5 mt-1 text-blue-600" />
+                            <div class="ml-3">
+                                <p class="text-sm font-medium text-blue-800">{{ $occupancyRate }}%</p>
+                                <p class="text-xs text-blue-700">Tingkat okupansi kamar</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-
 </x-app-layout>

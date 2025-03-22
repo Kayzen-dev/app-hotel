@@ -2,7 +2,7 @@
         
     {{-- @dd($data) --}}
 
-    <h2 class="text-2xl m-5 font-semibold text-gray-700 dark:text-white">Data Tamus</h2>
+    <h2 class="text-2xl m-5 font-semibold text-gray-700 dark:text-white">Data Tamu</h2>
 
 
     <div class="overflow-x-auto">

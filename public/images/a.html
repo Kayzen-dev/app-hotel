@@ -185,3 +185,183 @@ class ReservasiCreate extends Component
         return view('livewire.reservasi.reservasi-create');
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                 
+@if ($pembayaran)
+<div class="bg-white p-4 rounded-xl border border-gray-100">
+    <h4 class="text-sm font-semibold text-gray-500 mb-3">Detail Pembayaran</h4>
+    <div class="space-y-3">
+        <div class="flex justify-between">
+            <span class="text-sm text-gray-600">Jumlah Pembayaran</span>
+            <span class="text-sm font-medium text-green-600">
+                {{-- Rp {{ number_format($jumlahPembayaran, 0, ',', '.') }} --}}
+            </span>
+        </div>
+        
+        <div class="flex justify-between">
+            <span class="text-sm text-gray-600">Kembalian</span>
+            <span class="text-sm font-medium text-gray-900">
+                {{-- Rp {{ number_format($kembalian, 0, ',', '.') }} --}}
+            </span>
+        </div>
+        
+        @if($status_reservasi == 'check_out')
+            <div class="flex justify-between">
+                <span class="text-sm text-gray-600">Denda</span>
+                <span class="text-sm font-medium text-red-600">
+                    {{-- Rp {{ number_format($denda, 0, ',', '.') }} --}}
+                </span>
+            </div>
+        @endif
+        
+        <div class="pt-2 border-t border-gray-100">
+            <div class="flex justify-between items-center">
+                <span class="text-xs text-gray-500">Transaksi. {{ $user ?? 'System' }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+@endif
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="bg-blue-50 p-4 rounded-xl border border-blue-100" 
+     x-data="dendaComponent(
+         {{ $res->total_harga ?? 0 }}, 
+         {{ $res->pembayaran->jumlah_pembayaran ?? 0 }}
+     )">
+    <div class="flex items-center gap-4">
+        <!-- Input Denda -->
+        <div class="flex-1">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Denda</label>
+            <input type="text" 
+                   x-model.number="denda" 
+                   @input="$wire.Idenda = $event.target.value"
+                   class="input input-bordered w-full text-md btn-md" 
+                   placeholder="(Opsional) Masukkan jumlah denda">
+        </div>
+
+        <!-- Input Keterangan -->
+        <div class="flex-1">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Keterangan</label>
+            <textarea class="textarea textarea-bordered w-full text-md btn-md" 
+                      wire:model="Iketerangan" 
+                      placeholder="Masukkan keterangan"></textarea>
+        </div>
+
+        <!-- Input Bayar Kedua -->
+        <div class="flex-1" x-show="showBayarKedua">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Bayar Kedua</label>
+            <input type="text" 
+                   x-model.number="bayarKedua" 
+                   @input="$wire.bayarKedua = $event.target.value"
+                   class="input input-bordered w-full text-md btn-md" 
+                   placeholder="Masukkan pembayaran kedua">
+        </div>
+
+        <!-- Info Kembalian -->
+        <div x-show="kembalian >= 0" class="flex-1">
+            <p class="text-sm font-medium text-gray-700">
+                Kembalian: <span x-text="formatRupiah(kembalian)"></span>
+            </p>
+        </div>
+
+        <!-- Tombol Checkout -->
+        <div>
+            <button type="submit" 
+                    :disabled="!isCheckoutAllowed" 
+                    class="w-full mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition duration-200 disabled:opacity-50">
+                Checkout
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    function dendaComponent(initialTotal, initialPembayaran) {
+        return {
+            denda: 0,
+            bayarKedua: 0,
+            totalHarga: initialTotal,
+            pembayaranAwal: initialPembayaran,
+            
+            get showBayarKedua() {
+                return this.totalHarga > this.pembayaranAwal;
+            },
+            
+            get totalPembayaran() {
+                return this.pembayaranAwal + this.bayarKedua;
+            },
+            
+            get kembalian() {
+                return this.totalPembayaran - this.totalHarga;
+            },
+            
+            get isCheckoutAllowed() {
+                return this.kembalian >= 0 && 
+                      (!this.showBayarKedua || (this.showBayarKedua && this.bayarKedua > 0));
+            },
+            
+            formatRupiah(angka) {
+                return new Intl.NumberFormat("id-ID", {
+                    style: "currency",
+                    currency: "IDR",
+                    minimumFractionDigits: 0
+                }).format(angka || 0);
+            },
+            
+            init() {
+                this.$watch('denda', (value) => {
+                    this.totalHarga = initialTotal + (parseFloat(value) || 0);
+                });
+            }
+        }
+    }
+</script>
