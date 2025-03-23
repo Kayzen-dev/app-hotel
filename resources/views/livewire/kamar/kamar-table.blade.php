@@ -212,7 +212,7 @@
                     if (!this.selectedJenisKamar || !this.tanggal_check_in || !this.tanggal_check_out) return;
 
                     try {
-                        const response = await fetch(`/resepsionis/ketersediaan/${this.tanggal_check_in}/${this.tanggal_check_out}/${this.selectedJenisKamar}`);
+                        const response = await fetch(`/resepsionis/ketersediaan-new/${this.tanggal_check_in}/${this.tanggal_check_out}/${this.selectedJenisKamar}`);
 
                         // if (!response.ok) {
                         //     throw new Error(HTTP error! Status: ${response.status});

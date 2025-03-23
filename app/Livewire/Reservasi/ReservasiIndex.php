@@ -599,8 +599,8 @@ class ReservasiIndex extends Component
         );
 
         is_null($batal)
-        ? $this->dispatch('notify', title: 'fail', message: 'Hapus reservasi gagal dilakukan')
-        : $this->dispatch('notify', title: 'success', message: 'Hapus reservasi berhasil dilakukan');
+        ? $this->dispatch('notify', title: 'fail', message: 'Pembatalan reservasi gagal dilakukan')
+        : $this->dispatch('notify', title: 'success', message: 'Pembatalan reservasi berhasil dilakukan');
         $this->showModalBatal = false;
     }
 
