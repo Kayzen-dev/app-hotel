@@ -134,7 +134,7 @@ Route::middleware(['auth','verified','proses'])->group(function(){
     Route::prefix('resepsionis')->middleware('role:resepsionis')->group(function () {
         
    
-        // Di Reservasi
+        // Di Reservasi old
         Route::get('/ketersediaan-kamar/{tanggal_check_in}/{tanggal_check_out}/{id_jenis_kamar}', function ($tanggal_check_in, $tanggal_check_out, $id_jenis_kamar) {
             // Validasi input sederhana
             if (!strtotime($tanggal_check_in) || !strtotime($tanggal_check_out) || $tanggal_check_in >= $tanggal_check_out) {
@@ -226,102 +226,6 @@ Route::middleware(['auth','verified','proses'])->group(function(){
             ]);
 
         });
-
-
-
-        // keter 7 testing overbooking        
-        // Route::get('/ketersediaan-kamar/{tanggal_check_in}/{tanggal_check_out}/{id_jenis_kamar}/{jumlah_kamar}', function ($tanggal_check_in, $tanggal_check_out, $id_jenis_kamar, $jumlah_kamar) {
-        //     // Validasi input
-        //     if (!strtotime($tanggal_check_in) || !strtotime($tanggal_check_out) || $tanggal_check_in >= $tanggal_check_out) {
-        //         return response()->json(['error' => 'Tanggal tidak valid'], 400);
-        //     }
-        
-        //     if (!is_numeric($id_jenis_kamar) || !is_numeric($jumlah_kamar)) {
-        //         return response()->json(['error' => 'ID jenis kamar atau jumlah kamar tidak valid'], 400);
-        //     }
-        
-        //     $checkIN = Carbon::parse($tanggal_check_in)->format('Y-m-d');
-        //     $checkOUT = Carbon::parse($tanggal_check_out)->format('Y-m-d');
-        
-        //     // Ambil total kamar tersedia untuk jenis kamar tertentu
-        //     $total_kamar = DB::table('kamar')
-        //         ->where('id_jenis_kamar', $id_jenis_kamar)
-        //         ->where('status_kamar', 'tersedia')
-        //         ->count();
-        
-        //     // Ambil data kamar
-        //     $kamar = DB::table('kamar')->where('id_jenis_kamar', $id_jenis_kamar)->first();
-        //     if (!$kamar) {
-        //         return response()->json(['error' => 'ID jenis kamar tidak ditemukan'], 400);
-        //     }
-        
-        //     // Ambil diskon jika ada
-        //     $diskon = DB::table('diskon')
-        //         ->where('id_jenis_kamar', $id_jenis_kamar)
-        //         ->whereDate('tanggal_mulai', '<=', $checkIN)
-        //         ->whereDate('tanggal_berakhir', '>=', $checkIN)
-        //         ->first();
-        
-        //     // Ambil harga khusus jika ada
-        //     $harga = DB::table('harga')
-        //         ->where('id_jenis_kamar', $id_jenis_kamar)
-        //         ->whereDate('tanggal_mulai', '<=', $checkIN)
-        //         ->whereDate('tanggal_berakhir', '>=', $checkIN)
-        //         ->first();
-        
-        //     // Harga Dasar
-        //     $hargaDasar = $kamar->harga_kamar;
-        
-        //     // Harga Khusus jika ada kenaikan harga
-        //     $hargaKhusus = $harga ? $hargaDasar * (1 + ($harga->persentase_kenaikan_harga / 100)) : null;
-        
-        //     // Hitung harga akhir dengan diskon
-        //     $totalHarga = $diskon 
-        //         ? ($hargaKhusus ? $hargaKhusus * (1 - ($diskon->persentase / 100)) : $hargaDasar * (1 - ($diskon->persentase / 100)))
-        //         : ($hargaKhusus ?? $hargaDasar);
-        
-        //     // **Cek Overbooking**
-        //     $tanggal_mulai = Carbon::parse($tanggal_check_in);
-        //     $tanggal_selesai = Carbon::parse($tanggal_check_out);
-            
-        //     for ($tanggal = clone $tanggal_mulai; $tanggal < $tanggal_selesai; $tanggal->modify('+1 day')) {
-        //         $tgl = $tanggal->format('Y-m-d');
-        
-        //         // Hitung jumlah kamar yang sudah dipesan di tanggal ini
-        //         $reservasi_aktif = DB::table('reservasi')
-        //             ->whereIn('status_reservasi', ['dipesan', 'check_in'])
-        //             ->whereDate('tanggal_check_in', '<=', $tgl)
-        //             ->whereDate('tanggal_check_out', '>', $tgl)
-        //             ->sum('jumlah_kamar');
-        
-        //         $kamar_tersedia = $total_kamar - $reservasi_aktif;
-        
-        //         // **Cek Jika Overbooking**
-        //         if ($jumlah_kamar > $kamar_tersedia) {
-        //             return response()->json([
-        //                 'error' => "Overbooking pada tanggal $tgl! Hanya tersedia $kamar_tersedia kamar.",
-        //                 'tanggal' => $tgl,
-        //                 'kamar_tersedia' => $kamar_tersedia,
-        //                 'jumlah_diminta' => $jumlah_kamar
-        //             ], 400);
-        //         }
-        //     }
-        
-        //     // Jika tidak overbooking, kembalikan response dengan semua data yang diperlukan
-        //     return response()->json([
-        //         'status' => 'Tersedia',
-        //         'message' => "Kamar tersedia untuk periode $checkIN hingga $checkOUT.",
-        //         'total_kamar' => $total_kamar,
-        //         'jumlah_kamar_diminta' => $jumlah_kamar,
-        //         'harga_kamar' => number_format($hargaDasar, 2, '.', ''),
-        //         'harga_khusus' => $hargaKhusus ? number_format($hargaKhusus, 2, '.', '') : null,
-        //         'harga_final' => number_format($totalHarga, 2, '.', ''),
-        //         'id_diskon' => $diskon ? $diskon->id : null,
-        //         'persentase_diskon' => $diskon ? $diskon->persentase : 0,
-        //         'id_harga' => $harga ? $harga->id : null,
-        //         'persentase_kenaikan_harga' => $harga ? $harga->persentase_kenaikan_harga : 0
-        //     ]);
-        // });
 
 
         // keter 9 testing perhari ini bagus ini paling bagus
@@ -469,876 +373,78 @@ Route::middleware(['auth','verified','proses'])->group(function(){
         });
 
 
-        // Keter 9 update iini bagus
-        // Route::get('/ketersediaan-kamar/{tanggal_check_in}/{tanggal_check_out}/{id_jenis_kamar}/{jumlah_kamar}', function ($tanggal_check_in, $tanggal_check_out, $id_jenis_kamar, $jumlah_kamar) {
-        //     if (!strtotime($tanggal_check_in) || !strtotime($tanggal_check_out) || $tanggal_check_in >= $tanggal_check_out) {
-        //         return response()->json(['error' => 'Tanggal tidak valid'], 400);
-        //     }
-        
-        //     if (!is_numeric($id_jenis_kamar) || !is_numeric($jumlah_kamar)) {
-        //         return response()->json(['error' => 'ID jenis kamar atau jumlah kamar tidak valid'], 400);
-        //     }
-        
-        //     $checkIN = Carbon::parse($tanggal_check_in)->format('Y-m-d');
-        //     $checkOUT = Carbon::parse($tanggal_check_out)->format('Y-m-d');
-        
-        //     $total_kamar = DB::table('kamar')
-        //         ->where('id_jenis_kamar', $id_jenis_kamar)
-        //         ->where('status_kamar', 'tersedia')
-        //         ->count();
-        
-        //     if ($total_kamar == 0) {
-        //         return response()->json(['error' => 'Tidak ada kamar tersedia untuk jenis kamar ini.'], 400);
-        //     }
-        
-        //     $kamar = DB::table('kamar')->where('id_jenis_kamar', $id_jenis_kamar)->first();
-        
-        //     $diskon = DB::table('diskon')
-        //         ->where('id_jenis_kamar', $id_jenis_kamar)
-        //         ->whereDate('tanggal_mulai', '<=', $checkIN)
-        //         ->whereDate('tanggal_berakhir', '>=', $checkIN)
-        //         ->first();
-        
-        //     $harga = DB::table('harga')
-        //         ->where('id_jenis_kamar', $id_jenis_kamar)
-        //         ->whereDate('tanggal_mulai', '<=', $checkIN)
-        //         ->whereDate('tanggal_berakhir', '>=', $checkIN)
-        //         ->first();
-        
-        //     $hargaDasar = $kamar->harga_kamar;
-        //     $hargaKhusus = $harga ? $hargaDasar * (1 + ($harga->persentase_kenaikan_harga / 100)) : null;
-        //     $totalHarga = $diskon 
-        //         ? ($hargaKhusus ? $hargaKhusus * (1 - ($diskon->persentase / 100)) : $hargaDasar * (1 - ($diskon->persentase / 100)))
-        //         : ($hargaKhusus ?? $hargaDasar);
-        
-        //     // // Ambil semua reservasi dalam satu query
-        //     $reservasi = DB::table('reservasi')
-        //        ->join('pesanan', 'reservasi.id', '=', 'pesanan.id_reservasi')
-        //     ->join('kamar', 'pesanan.id_kamar', '=', 'kamar.id')
-        //         ->whereIn('status_reservasi', ['dipesan', 'check_in'])
-        //         ->whereDate('tanggal_check_out', '>', $checkIN)
-        //         ->where('id_jenis_kamar', $id_jenis_kamar)
-        //         ->get();
-
-
-        //     // $reservasi_aktif = DB::table('reservasi')
-        //     // ->join('pesanan', 'reservasi.id', '=', 'pesanan.id_reservasi')
-        //     // ->join('kamar', 'pesanan.id_kamar', '=', 'kamar.id')
-        //     // ->where('kamar.id_jenis_kamar', $id_jenis_kamar)
-        //     // ->whereIn('reservasi.status_reservasi', ['dipesan', 'check_in'])
-        //     // ->whereDate('reservasi.tanggal_check_in', '<=', $tgl)
-        //     // ->whereDate('reservasi.tanggal_check_out', '>', $tgl)
-        //     // ->get();
-
-        
-        //     $ketersediaan_per_hari = [];
-        //     $total_akumulasi_kamar = 0;
-        //     $tanggal_mulai = Carbon::parse($tanggal_check_in);
-        //     $tanggal_selesai = Carbon::parse($tanggal_check_out);
-        
-        //     for ($tanggal = clone $tanggal_mulai; $tanggal < $tanggal_selesai; $tanggal->modify('+1 day')) {
-        //         Carbon::setLocale('id');
-        //         $tglID = $tanggal->translatedFormat('d F Y');
-        //         $tgl = $tanggal->format('Y-m-d');
-        
-        //         $reservasi_aktif = $reservasi->whereBetween('tanggal_check_in', [$tgl, $tgl])->sum('jumlah_kamar');
-
-                
-        //         $kamar_tersedia = $total_kamar - $reservasi_aktif;
-        //         $total_akumulasi_kamar += max($kamar_tersedia, 0);
-        
-        //         $ketersediaan_per_hari[] = [
-        //             'tanggal' => $tgl,
-        //             'kamar_terpakai' => $reservasi_aktif,
-        //             'kamar_tersedia' => max($kamar_tersedia, 0)
-        //         ];
-        //     }
-        
-        //     $kamar_tersedia = min(array_column($ketersediaan_per_hari, 'kamar_tersedia'));
-        
-        //     return response()->json([
-        //         'status' => 'Tersedia',
-        //         'total_kamar' => $total_kamar,
-        //         'kamar_tersedia' => $kamar_tersedia,
-        //         'total_akumulasi_kamar' => $total_akumulasi_kamar,
-        //         'harga_final' => number_format($totalHarga, 2, '.', ''),
-        //         'ketersediaan_per_hari' => $ketersediaan_per_hari
-        //     ]);
-        // });
-        
-
-
-
-        // keter 8 testing ketersedia_perhari
-        // Route::get('/ketersediaan-kamar/{tanggal_check_in}/{tanggal_check_out}/{id_jenis_kamar}/{jumlah_kamar}', function ($tanggal_check_in, $tanggal_check_out, $id_jenis_kamar, $jumlah_kamar) {
-        //     // Validasi input
-        //     if (!strtotime($tanggal_check_in) || !strtotime($tanggal_check_out) || $tanggal_check_in >= $tanggal_check_out) {
-        //         return response()->json(['error' => 'Tanggal tidak valid'], 400);
-        //     }
-
-        //     if (!is_numeric($id_jenis_kamar) || !is_numeric($jumlah_kamar)) {
-        //         return response()->json(['error' => 'ID jenis kamar atau jumlah kamar tidak valid'], 400);
-        //     }
-
-        //     $checkIN = Carbon::parse($tanggal_check_in)->format('Y-m-d');
-        //     $checkOUT = Carbon::parse($tanggal_check_out)->format('Y-m-d');
-
-        //     // Ambil total kamar tersedia untuk jenis kamar tertentu
-        //     $total_kamar = DB::table('kamar')
-        //         ->where('id_jenis_kamar', $id_jenis_kamar)
-        //         ->where('status_kamar', 'tersedia')
-        //         ->count();
-
-        //     // Ambil data kamar
-        //     $kamar = DB::table('kamar')->where('id_jenis_kamar', $id_jenis_kamar)->first();
-        //     if (!$kamar) {
-        //         return response()->json(['error' => 'ID jenis kamar tidak ditemukan'], 400);
-        //     }
-
-        //     // Ambil diskon jika ada
-        //     $diskon = DB::table('diskon')
-        //         ->where('id_jenis_kamar', $id_jenis_kamar)
-        //         ->whereDate('tanggal_mulai', '<=', $checkIN)
-        //         ->whereDate('tanggal_berakhir', '>=', $checkIN)
-        //         ->first();
-
-        //     // Ambil harga khusus jika ada
-        //     $harga = DB::table('harga')
-        //         ->where('id_jenis_kamar', $id_jenis_kamar)
-        //         ->whereDate('tanggal_mulai', '<=', $checkIN)
-        //         ->whereDate('tanggal_berakhir', '>=', $checkIN)
-        //         ->first();
-
-        //     // Harga Dasar
-        //     $hargaDasar = $kamar->harga_kamar;
-
-        //     // Harga Khusus jika ada kenaikan harga
-        //     $hargaKhusus = $harga ? $hargaDasar * (1 + ($harga->persentase_kenaikan_harga / 100)) : null;
-
-        //     // Hitung harga akhir dengan diskon
-        //     $totalHarga = $diskon 
-        //         ? ($hargaKhusus ? $hargaKhusus * (1 - ($diskon->persentase / 100)) : $hargaDasar * (1 - ($diskon->persentase / 100)))
-        //         : ($hargaKhusus ?? $hargaDasar);
-
-        //     // **Cek Overbooking & Buat Ketersediaan Per Hari**
-        //     $ketersediaan_per_hari = [];
-        //     $tanggal_mulai = Carbon::parse($tanggal_check_in);
-        //     $tanggal_selesai = Carbon::parse($tanggal_check_out);
-            
-        //     for ($tanggal = clone $tanggal_mulai; $tanggal < $tanggal_selesai; $tanggal->modify('+1 day')) {
-        //         $tgl = $tanggal->format('Y-m-d');
-
-        //         // Hitung jumlah kamar yang sudah dipesan di tanggal ini
-        //         $reservasi_aktif = DB::table('reservasi')
-        //             ->whereIn('status_reservasi', ['dipesan', 'check_in'])
-        //             ->whereDate('tanggal_check_in', '<=', $tgl)
-        //             ->whereDate('tanggal_check_out', '>', $tgl)
-        //             ->sum('jumlah_kamar');
-
-        //         $kamar_tersedia = $total_kamar - $reservasi_aktif;
-
-        //         // Tambahkan ke array ketersediaan
-        //         $ketersediaan_per_hari[] = [
-        //             'tanggal' => $tgl,
-        //             'kamar_terpakai' => $reservasi_aktif,
-        //             'kamar_tersedia' => max($kamar_tersedia, 0)
-        //         ];
-
-        //         // **Cek Jika Overbooking**
-        //         if ($jumlah_kamar > $kamar_tersedia) {
-        //             return response()->json([
-        //                 'error' => "Overbooking pada tanggal $tgl! Hanya tersedia $kamar_tersedia kamar.",
-        //                 'tanggal' => $tgl,
-        //                 'kamar_tersedia' => $kamar_tersedia,
-        //                 'jumlah_diminta' => $jumlah_kamar,
-        //                 'ketersediaan_per_hari' => $ketersediaan_per_hari
-        //             ], 400);
-        //         }
-        //     }
-
-        //     // Jika tidak overbooking, kembalikan response dengan semua data yang diperlukan
-        //     return response()->json([
-        //         'status' => 'Tersedia',
-        //         'message' => "Kamar tersedia untuk periode $checkIN hingga $checkOUT.",
-        //         'total_kamar' => $total_kamar,
-        //         'jumlah_kamar_diminta' => $jumlah_kamar,
-        //         'harga_kamar' => number_format($hargaDasar, 2, '.', ''),
-        //         'harga_khusus' => $hargaKhusus ? number_format($hargaKhusus, 2, '.', '') : null,
-        //         'harga_final' => number_format($totalHarga, 2, '.', ''),
-        //         'id_diskon' => $diskon ? $diskon->id : null,
-        //         'persentase_diskon' => $diskon ? $diskon->persentase : 0,
-        //         'id_harga' => $harga ? $harga->id : null,
-        //         'persentase_kenaikan_harga' => $harga ? $harga->persentase_kenaikan_harga : 0,
-        //         'ketersediaan_per_hari' => $ketersediaan_per_hari
-        //     ]);
-        // });
-
-        
-
-        // keter 5 ini bagus
-        // Route::get('/ketersediaan-kamar/{tanggal_check_in}/{tanggal_check_out}/{id_jenis_kamar}', function ($tanggal_check_in, $tanggal_check_out, $id_jenis_kamar) {
-        //     // Validasi input sederhana
-        //     if (!strtotime($tanggal_check_in) || !strtotime($tanggal_check_out) || $tanggal_check_in >= $tanggal_check_out) {
-        //         return response()->json(['error' => 'Tanggal tidak valid'], 400);
-        //     }
-
-        //     if (!is_numeric($id_jenis_kamar)) {
-        //         return response()->json(['error' => 'ID jenis kamar tidak valid'], 400);
-        //     }
-
-        //     $checkIN = Carbon::parse($tanggal_check_in)->format('Y-m-d');
-        //     $checkOUT = Carbon::parse($tanggal_check_out)->format('Y-m-d');
-
-        //     // Ambil diskon jika ada
-        //     $diskon = Diskon::where('id_jenis_kamar', $id_jenis_kamar)
-        //         ->whereDate('tanggal_mulai', '<=', $checkIN)
-        //         ->whereDate('tanggal_berakhir', '>=', $checkIN)
-        //         ->first();
-
-        //     // Ambil harga khusus jika ada
-        //     $harga = Harga::where('id_jenis_kamar', $id_jenis_kamar)
-        //         ->whereDate('tanggal_mulai', '<=', $checkIN)
-        //         ->whereDate('tanggal_berakhir', '>=', $checkIN)
-        //         ->first();
-
-        //     // Ambil total kamar tersedia untuk jenis kamar tertentu
-        //     $total_kamar = DB::table('kamar')
-        //         ->where('id_jenis_kamar', $id_jenis_kamar)
-        //         ->where('status_kamar', 'tersedia')
-        //         ->count();
-
-        //     $kamar = Kamar::with('jenisKamar')->where('id_jenis_kamar', $id_jenis_kamar)->first();
-
-        //     if (!$kamar) {
-        //         return response()->json(['error' => 'ID jenis kamar tidak ditemukan'], 400);
-        //     }
-
-        //     // Buat array untuk menyimpan ketersediaan per hari
-        //     $ketersediaan_per_hari = [];
-        //     $total_akumulasi_kamar = 0;
-
-        //     $tanggal_mulai = Carbon::parse($tanggal_check_in);
-        //     $tanggal_selesai = Carbon::parse($tanggal_check_out);
-            
-        //     for ($tanggal = clone $tanggal_mulai; $tanggal < $tanggal_selesai; $tanggal->modify('+1 day')) {
-        //         Carbon::setLocale('id');
-        //         $tglID = $tanggal->translatedFormat('d F Y');
-        //         $tgl = $tanggal->format('Y-m-d');
-
-        //         // Ambil semua reservasi aktif (status 'dipesan') dengan overlap
-        //         $reservasi_aktif = Reservasi::whereIn('status_reservasi', ['dipesan','check_in'])
-        //             ->whereDate('tanggal_check_in', '<=', $tgl)
-        //             ->whereDate('tanggal_check_out', '>', $tgl) // Check-out > tanggal, berarti masih menginap
-        //             ->sum('jumlah_kamar'); // Hitung jumlah kamar yang dipesan
-
-        //         $kamar_tersedia = $total_kamar - $reservasi_aktif;
-
-        //         $ketersediaan_per_hari[] = [
-        //             'tanggal' => $tgl,
-        //             'tanggal_ID' => $tglID,
-        //             'jenis_kamar' => $kamar->jenisKamar->tipe_kamar . ' - ' . $kamar->jenisKamar->jenis_ranjang,
-        //             'total_kamar' => $total_kamar,
-        //             'kamar_terpakai' => $reservasi_aktif,
-        //             'kamar_tersedia' => max($kamar_tersedia, 0)
-        //         ];
-
-        //         $total_akumulasi_kamar += max($kamar_tersedia, 0);
-        //     }
-
-        //     // Hitung harga dasar & diskon
-        //     $hargaDasar = $kamar->harga_kamar;
-        //     $hargaKhusus = $harga ? $hargaDasar * (1 + ($harga->persentase_kenaikan_harga / 100)) : null;
-        //     $totalHarga = $diskon 
-        //         ? ($hargaKhusus ? $hargaKhusus * (1 - ($diskon->persentase / 100)) : $hargaDasar * (1 - ($diskon->persentase / 100)))
-        //         : ($hargaKhusus ?? $hargaDasar);
-
-        //     return response()->json([
-        //         'harga' => number_format($totalHarga, 2, '.', ''),
-        //         'ketersediaan_per_hari' => $ketersediaan_per_hari,
-        //         'total_akumulasi_kamar' => $total_akumulasi_kamar,
-        //         'id_diskon' => $diskon ? $diskon->id : null,
-        //         'persentase_diskon' => $diskon ? $diskon->persentase : 0,
-        //         'id_harga' => $harga ? $harga->id : null,
-        //         'persentase_kenaikan_harga' => $harga ? $harga->persentase_kenaikan_harga : 0
-        //     ]);
-        // });
-
-
-        // keter 6 test, ini sesuai dengan tanggal nya, jika tanggal_check_out nya 15, maka akan memunculkan data sampai tanggal 15
-        // Route::get('/ketersediaan-kamar/{tanggal_check_in}/{tanggal_check_out}/{id_jenis_kamar}', function ($tanggal_check_in, $tanggal_check_out, $id_jenis_kamar) {
-        //     // Validasi input sederhana
-        //     if (!strtotime($tanggal_check_in) || !strtotime($tanggal_check_out) || $tanggal_check_in >= $tanggal_check_out) {
-        //         return response()->json(['error' => 'Tanggal tidak valid'], 400);
-        //     }
-
-        //     if (!is_numeric($id_jenis_kamar)) {
-        //         return response()->json(['error' => 'ID jenis kamar tidak valid'], 400);
-        //     }
-
-        //     $checkIN = Carbon::parse($tanggal_check_in)->format('Y-m-d');
-        //     $checkOUT = Carbon::parse($tanggal_check_out)->format('Y-m-d');
-
-        //     // Ambil diskon jika ada
-        //     $diskon = Diskon::where('id_jenis_kamar', $id_jenis_kamar)
-        //         ->whereDate('tanggal_mulai', '<=', $checkIN)
-        //         ->whereDate('tanggal_berakhir', '>=', $checkIN)
-        //         ->first();
-
-        //     // Ambil harga khusus jika ada
-        //     $harga = Harga::where('id_jenis_kamar', $id_jenis_kamar)
-        //         ->whereDate('tanggal_mulai', '<=', $checkIN)
-        //         ->whereDate('tanggal_berakhir', '>=', $checkIN)
-        //         ->first();
-
-        //     // Ambil total kamar tersedia untuk jenis kamar tertentu
-        //     $total_kamar = DB::table('kamar')
-        //         ->where('id_jenis_kamar', $id_jenis_kamar)
-        //         ->where('status_kamar', 'tersedia')
-        //         ->count();
-
-        //     $kamar = Kamar::with('jenisKamar')->where('id_jenis_kamar', $id_jenis_kamar)->first();
-
-        //     if (!$kamar) {
-        //         return response()->json(['error' => 'ID jenis kamar tidak ditemukan'], 400);
-        //     }
-
-        //     // Buat array untuk menyimpan ketersediaan per hari
-        //     $ketersediaan_per_hari = [];
-        //     $total_akumulasi_kamar = 0;
-
-        //     $tanggal_mulai = Carbon::parse($tanggal_check_in);
-        //     $tanggal_selesai = Carbon::parse($tanggal_check_out);
-            
-        //     for ($tanggal = clone $tanggal_mulai; $tanggal <= $tanggal_selesai; $tanggal->addDay()) {
-        //         Carbon::setLocale('id');
-        //         $tglID = $tanggal->translatedFormat('d F Y');
-        //         $tgl = $tanggal->format('Y-m-d');
-
-        //         // Ambil semua reservasi aktif (status 'dipesan') dengan overlap
-        //         $reservasi_aktif = Reservasi::whereIn('status_reservasi', ['dipesan','check_in'])
-        //             ->whereDate('tanggal_check_in', '<=', $tgl)
-        //             ->whereDate('tanggal_check_out', '>', $tgl) // Check-out > tanggal, berarti masih menginap
-        //             ->sum('jumlah_kamar'); // Hitung jumlah kamar yang dipesan
-
-        //         $kamar_tersedia = $total_kamar - $reservasi_aktif;
-
-        //         $ketersediaan_per_hari[] = [
-        //             'tanggal' => $tgl,
-        //             'tanggal_ID' => $tglID,
-        //             'jenis_kamar' => $kamar->jenisKamar->tipe_kamar . ' - ' . $kamar->jenisKamar->jenis_ranjang,
-        //             'total_kamar' => $total_kamar,
-        //             'kamar_terpakai' => $reservasi_aktif,
-        //             'kamar_tersedia' => max($kamar_tersedia, 0)
-        //         ];
-
-        //         $total_akumulasi_kamar += max($kamar_tersedia, 0);
-        //     }
-
-        //     // Hitung harga dasar & diskon
-        //     $hargaDasar = $kamar->harga_kamar;
-        //     $hargaKhusus = $harga ? $hargaDasar * (1 + ($harga->persentase_kenaikan_harga / 100)) : null;
-        //     $totalHarga = $diskon 
-        //         ? ($hargaKhusus ? $hargaKhusus * (1 - ($diskon->persentase / 100)) : $hargaDasar * (1 - ($diskon->persentase / 100)))
-        //         : ($hargaKhusus ?? $hargaDasar);
-
-        //     return response()->json([
-        //         'harga' => number_format($totalHarga, 2, '.', ''),
-        //         'ketersediaan_per_hari' => $ketersediaan_per_hari,
-        //         'total_akumulasi_kamar' => $total_akumulasi_kamar,
-        //         'id_diskon' => $diskon ? $diskon->id : null,
-        //         'persentase_diskon' => $diskon ? $diskon->persentase : 0,
-        //         'id_harga' => $harga ? $harga->id : null,
-        //         'persentase_kenaikan_harga' => $harga ? $harga->persentase_kenaikan_harga : 0
-        //     ]);
-        // });
-
-
-
 
 
 
         Route::get('/ketersediaan-kamarR', function () {
-            // $kamar_dipesan = Reservasi::join('pesanan', 'reservasi.id', '=', 'pesanan.id_reservasi')
-            // ->join('kamar', 'pesanan.id_kamar', '=', 'kamar.id')
-            // ->where('kamar.id_jenis_kamar', $id_jenis_kamar)
-            // ->whereIn('reservasi.status_reservasi', ['dipesan', 'check_in'])
-            // ->where(function ($query) use ($tgl) {
-            //     $query->where(function ($q) use ($tgl) {
-            //         $q->where('reservasi.tanggal_check_in', '<=', $tgl)
-            //           ->where('reservasi.tanggal_check_out', '>', $tgl);
-            //     });
-            // })
-            // ->count();
-
-
-
-
             return Reservasi::whereIn('reservasi.status_reservasi', ['dipesan', 'check_in'])->get();
-
-            // return Reservasi::all();
-
         });
 
-        // Keter1
-        // Route::get('/ketersediaan-kamar/{tanggal_check_in}/{tanggal_check_out}/{id_jenis_kamar}', function ($tanggal_check_in, $tanggal_check_out, $id_jenis_kamar) {
-        //     // Validasi input sederhana
-        //     if (!strtotime($tanggal_check_in) || !strtotime($tanggal_check_out) || $tanggal_check_in >= $tanggal_check_out) {
-        //         return response()->json(['error' => 'Tanggal tidak valid'], 400);
-        //     }
-        
-        //     if (!is_numeric($id_jenis_kamar)) {
-        //         return response()->json(['error' => 'ID jenis kamar tidak valid'], 400);
-        //     }
-        
-        //     $checkIN = Carbon::parse($tanggal_check_in)->format('Y-m-d');
-        //     $checkOUT = Carbon::parse($tanggal_check_out)->format('Y-m-d');
-        
-        //     // Ambil diskon yang berlaku pada tanggal check-in
-        //     $diskon = Diskon::where('id_jenis_kamar', $id_jenis_kamar)
-        //         ->whereDate('tanggal_mulai', '<=', $checkIN)
-        //         ->whereDate('tanggal_berakhir', '>=', $checkIN)
-        //         ->first();
-        
-        //     // Ambil harga yang berlaku pada tanggal check-in
-        //     $harga = Harga::where('id_jenis_kamar', $id_jenis_kamar)
-        //         ->whereDate('tanggal_mulai', '<=', $checkIN)
-        //         ->whereDate('tanggal_berakhir', '>=', $checkIN)
-        //         ->first();
-        
-        //     // Ambil total kamar yang tersedia untuk jenis kamar tertentu
-        //     $total_kamar = Kamar::where('id_jenis_kamar', $id_jenis_kamar)
-        //         ->where('status_kamar', 'tersedia')
-        //         ->count();
-        
-        //     $kamar = Kamar::with('jenisKamar')->where('id_jenis_kamar', $id_jenis_kamar)->first();
-        
-        //     if (!$kamar) {
-        //         return response()->json(['error' => 'ID jenis kamar tidak ditemukan'], 400);
-        //     }
-        
-        //     // Buat array untuk menyimpan ketersediaan per hari
-        //     $ketersediaan_per_hari = [];
-        //     $total_akumulasi_kamar = 0; // Menyimpan total akumulasi kamar
-        
-        //     $tanggal_mulai = Carbon::parse($tanggal_check_in);
-        //     $tanggal_selesai = Carbon::parse($tanggal_check_out);
-        
-        //     for ($tanggal = clone $tanggal_mulai; $tanggal < $tanggal_selesai; $tanggal->modify('+1 day')) {
-        //         Carbon::setLocale('id');
-        //         $tglID = $tanggal->translatedFormat('d F Y');
-        //         $tgl = $tanggal->format('Y-m-d');
-        
-        //         // Hitung jumlah kamar yang sudah dipesan atau sedang ditempati pada tanggal tersebut
-        //         $kamar_dipesan = Reservasi::join('pesanan', 'reservasi.id', '=', 'pesanan.id_reservasi')
-        //             ->join('kamar', 'pesanan.id_kamar', '=', 'kamar.id')
-        //             ->where('kamar.id_jenis_kamar', $id_jenis_kamar)
-        //             ->whereIn('reservasi.status_reservasi', ['dipesan', 'check_in'])
-        //             ->where(function ($query) use ($tgl) {
-        //                 $query->where(function ($q) use ($tgl) {
-        //                     $q->where('reservasi.tanggal_check_in', '<=', $tgl)
-        //                       ->where('reservasi.tanggal_check_out', '>', $tgl);
-        //                 });
-        //             })
-        //             ->count();
-        
-        //         // Hitung kamar yang tersedia
-        //         $kamar_tersedia = $total_kamar - $kamar_dipesan;
-        //         // $kamar_tersedia = $total_kamar - $kamar_dipesan;
-        
-        //         // Simpan hasil per hari
-        //         $ketersediaan_per_hari[] = [
-        //             'tanggal' => $tgl,
-        //             'tanggal_ID' => $tglID,
-        //             'jenis_kamar' => $kamar->jenisKamar->tipe_kamar . ' - ' . $kamar->jenisKamar->jenis_ranjang,
-        //             'total_kamar' => $total_kamar,
-        //             'kamar_tersedia' => $kamar_tersedia,
-        //             'kamar_dipesan' => $kamar_dipesan
-        //         ];
-        
-        //         // Tambahkan ke total akumulasi kamar
-        //         $total_akumulasi_kamar += $kamar_tersedia;
-        //     }
-        
-        //     $hargaDasar = $kamar->harga_kamar;
-        
-        //     $hargaKhusus = $harga ? $hargaDasar * (1 + ($harga->persentase_kenaikan_harga / 100)) : null;
-        
-        //     $totalHarga = $diskon ? ($hargaKhusus ? $hargaKhusus * (1 - ($diskon->persentase / 100)) : ($diskon ? $hargaDasar * (1 - ($diskon->persentase / 100)) : null)) :
-        //         ($harga ? $hargaDasar * (1 + ($harga->persentase_kenaikan_harga / 100)) : $hargaDasar);
-        
-        //     return response()->json([
-        //         'harga' => number_format($totalHarga, 2, '.', ''),
-        //         'ketersediaan_per_hari' => $ketersediaan_per_hari,
-        //         'total_akumulasi_kamar' => $total_akumulasi_kamar,
-        //         'id_diskon' => $diskon ? $diskon->id : null,
-        //         'persentase_diskon' => $diskon ? $diskon->persentase : 0,
-        //         'id_harga' => $harga ? $harga->id : null,
-        //         'persentase_kenaikan_harga' => $harga ? $harga->persentase_kenaikan_harga : 0
-        //     ]);
-        // });
-
-        // Keter 3
-        // Route::get('/ketersediaan-kamar/{tanggal_check_in}/{tanggal_check_out}/{id_jenis_kamar}', function ($tanggal_check_in, $tanggal_check_out, $id_jenis_kamar) {
-        //     // Validasi input
-        //     if (!strtotime($tanggal_check_in) || !strtotime($tanggal_check_out) || $tanggal_check_in >= $tanggal_check_out) {
-        //         return response()->json(['error' => 'Tanggal tidak valid'], 400);
-        //     }
-        
-        //     if (!is_numeric($id_jenis_kamar)) {
-        //         return response()->json(['error' => 'ID jenis kamar tidak valid'], 400);
-        //     }
-        
-        //     $checkIN = Carbon::parse($tanggal_check_in)->format('Y-m-d');
-        //     $checkOUT = Carbon::parse($tanggal_check_out)->format('Y-m-d');
-        
-        //     // Ambil data jenis kamar
-        //     $jenisKamar = JenisKamar::find($id_jenis_kamar);
-        //     if (!$jenisKamar) {
-        //         return response()->json(['error' => 'Jenis kamar tidak ditemukan'], 400);
-        //     }
-        //     $total_kamar = $jenisKamar->total_kamar;
-        
-        //     // Ambil diskon dan harga yang berlaku
-        //     $diskon = Diskon::where('id_jenis_kamar', $id_jenis_kamar)
-        //         ->whereDate('tanggal_mulai', '<=', $checkIN)
-        //         ->whereDate('tanggal_berakhir', '>=', $checkIN)
-        //         ->first();
-        
-        //     $harga = Harga::where('id_jenis_kamar', $id_jenis_kamar)
-        //         ->whereDate('tanggal_mulai', '<=', $checkIN)
-        //         ->whereDate('tanggal_berakhir', '>=', $checkIN)
-        //         ->first();
-        
-        //     // Hitung ketersediaan per hari
-        //     $ketersediaan_per_hari = [];
-        //     $total_akumulasi_kamar = 0;
-        
-        //     $tanggal_mulai = Carbon::parse($checkIN);
-        //     $tanggal_selesai = Carbon::parse($checkOUT);
-        
-        //     for ($tanggal = clone $tanggal_mulai; $tanggal->lt($tanggal_selesai); $tanggal->addDay()) {
-        //         $tgl = $tanggal->format('Y-m-d');
-        //         $tglID = $tanggal->translatedFormat('d F Y');
-        
-        //         // Query kamar yang terpakai pada tanggal ini
-        //         $kamar_dipesan = Reservasi::join('pesanan', 'reservasi.id', '=', 'pesanan.id_reservasi')
-        //             ->join('kamar', 'pesanan.id_kamar', '=', 'kamar.id')
-        //             ->where('kamar.id_jenis_kamar', $id_jenis_kamar)
-        //             ->whereIn('reservasi.status_reservasi', ['dipesan', 'check_in'])
-        //             ->where(function ($query) use ($tgl) {
-        //                 $query->where('reservasi.tanggal_check_in', '<=', $tgl)
-        //                     ->where('reservasi.tanggal_check_out', '>', $tgl);
-        //             })
-        //             ->count();
-        
-        //         $kamar_tersedia = $total_kamar - $kamar_dipesan;
-        
-        //         $ketersediaan_per_hari[] = [
-        //             'tanggal' => $tgl,
-        //             'tanggal_ID' => $tglID,
-        //             'jenis_kamar' => $jenisKamar->tipe_kamar . ' - ' . $jenisKamar->jenis_ranjang,
-        //             'total_kamar' => $total_kamar,
-        //             'kamar_tersedia' => $kamar_tersedia,
-        //             'kamar_dipesan' => $kamar_dipesan
-        //         ];
-        
-        //         $total_akumulasi_kamar += $kamar_tersedia;
-        //     }
-        
-        //     // Hitung harga dengan diskon dan kenaikan
-        //     $hargaDasar = $jenisKamar->harga_kamar;
-        //     $hargaAwal = $hargaDasar;
-        
-        //     if ($harga) {
-        //         $hargaAwal = $hargaDasar * (1 + ($harga->persentase_kenaikan_harga / 100));
-        //     }
-        
-        //     if ($diskon) {
-        //         $hargaAwal = $hargaAwal * (1 - ($diskon->persentase / 100));
-        //     }
-        
-        //     $totalHarga = number_format($hargaAwal, 2, '.', '');
-        
-        //     return response()->json([
-        //         'harga' => $totalHarga,
-        //         'ketersediaan_per_hari' => $ketersediaan_per_hari,
-        //         'total_akumulasi_kamar' => $total_akumulasi_kamar,
-        //         'id_diskon' => $diskon ? $diskon->id : null,
-        //         'persentase_diskon' => $diskon ? $diskon->persentase : 0,
-        //         'id_harga' => $harga ? $harga->id : null,
-        //         'persentase_kenaikan_harga' => $harga ? $harga->persentase_kenaikan_harga : 0
-        //     ]);
-        // });
-
-        // keter 4
-        // Route::get('/ketersediaan-kamar/{tanggal_check_in}/{tanggal_check_out}/{id_jenis_kamar}', function ($tanggal_check_in, $tanggal_check_out, $id_jenis_kamar) {
-        //     // Validasi input
-        //     try {
-        //         $checkIN = Carbon::parse($tanggal_check_in);
-        //         $checkOUT = Carbon::parse($tanggal_check_out);
-        //     } catch (\Exception $e) {
-        //         return response()->json(['error' => 'Format tanggal tidak valid'], 400);
-        //     }
-        
-        //     if ($checkIN->gte($checkOUT)) {
-        //         return response()->json(['error' => 'Tanggal check-out harus setelah tanggal check-in'], 400);
-        //     }
-        
-        //     if (!is_numeric($id_jenis_kamar)) {
-        //         return response()->json(['error' => 'ID jenis kamar tidak valid'], 400);
-        //     }
-        
-        //     // Ambil data jenis kamar
-        //     $jenisKamar = JenisKamar::find($id_jenis_kamar);
-        //     if (!$jenisKamar) {
-        //         return response()->json(['error' => 'Jenis kamar tidak ditemukan'], 404);
-        //     }
-        
-        //     // Hitung total kamar tersedia berdasarkan data aktual
-        //     $total_kamar = Kamar::where([
-        //         'id_jenis_kamar' => $id_jenis_kamar,
-        //         'status_kamar' => 'tersedia'
-        //     ])->count();
-        
-        //     // Ambil data harga dan diskon
-        //     $diskon = Diskon::where('id_jenis_kamar', $id_jenis_kamar)
-        //         ->whereDate('tanggal_mulai', '<=', $checkIN)
-        //         ->whereDate('tanggal_berakhir', '>=', $checkIN)
-        //         ->first();
-        
-        //     $harga = Harga::where('id_jenis_kamar', $id_jenis_kamar)
-        //         ->whereDate('tanggal_mulai', '<=', $checkIN)
-        //         ->whereDate('tanggal_berakhir', '>=', $checkIN)
-        //         ->first();
-        
-        //     // Hitung ketersediaan harian
-        //     $ketersediaan_per_hari = [];
-        //     $total_akumulasi_kamar = 0;
-        
-        //     $tanggal_mulai = clone $checkIN;
-        //     $tanggal_selesai = clone $checkOUT;
-        
-        //     for ($tanggal = clone $tanggal_mulai; $tanggal->lt($tanggal_selesai); $tanggal->addDay()) {
-        //         $tgl = $tanggal->format('Y-m-d');
-                
-        //         // Hitung kamar yang terpakai
-        //         $kamar_dipesan = Reservasi::join('pesanan', 'reservasi.id', '=', 'pesanan.id_reservasi')
-        //             ->join('kamar', 'pesanan.id_kamar', '=', 'kamar.id')
-        //             ->where('kamar.id_jenis_kamar', $id_jenis_kamar)
-        //             ->whereIn('reservasi.status_reservasi', ['dipesan', 'check_in'])
-        //             ->where(function ($query) use ($tgl) {
-        //                 $query->where('reservasi.tanggal_check_in', '<=', $tgl)
-        //                     ->where('reservasi.tanggal_check_out', '>', $tgl);
-        //             })
-        //             ->count();
-        
-        //         $kamar_tersedia = $total_kamar - $kamar_dipesan;
-        
-        //         $ketersediaan_per_hari[] = [
-        //             'tanggal' => $tgl,
-        //             'tanggal_ID' => $tanggal->translatedFormat('d F Y'),
-        //             'jenis_kamar' => $jenisKamar->tipe_kamar . ' - ' . $jenisKamar->jenis_ranjang,
-        //             'total_kamar' => $total_kamar,
-        //             'kamar_tersedia' => max($kamar_tersedia, 0), // Pastikan tidak minus
-        //             'kamar_dipesan' => $kamar_dipesan
-        //         ];
-        
-        //         $total_akumulasi_kamar += $kamar_tersedia;
-        //     }
-        
-        //     // Hitung harga
-        //     $hargaDasar = $jenisKamar->harga_kamar;
-            
-        //     // Validasi harga dasar
-        //     if ($hargaDasar <= 0) {
-        //         return response()->json([
-        //             'error' => 'Harga dasar kamar tidak valid untuk jenis kamar ini',
-        //             'details' => 'Pastikan harga dasar di tabel jenis_kamar sudah diisi dengan benar'
-        //         ], 500);
-        //     }
-        
-        //     // Terapkan kenaikan harga jika ada
-        //     if ($harga) {
-        //         $hargaDasar *= (1 + ($harga->persentase_kenaikan_harga / 100));
-        //     }
-        
-        //     // Terapkan diskon jika ada
-        //     if ($diskon) {
-        //         $hargaDasar *= (1 - ($diskon->persentase / 100));
-        //     }
-        
-        //     return response()->json([
-        //         'harga' => number_format($hargaDasar, 2, '.', ''),
-        //         'ketersediaan_per_hari' => $ketersediaan_per_hari,
-        //         'total_akumulasi_kamar' => max($total_akumulasi_kamar, 0),
-        //         'id_diskon' => $diskon ? $diskon->id : null,
-        //         'persentase_diskon' => $diskon ? $diskon->persentase : 0,
-        //         'id_harga' => $harga ? $harga->id : null,
-        //         'persentase_kenaikan_harga' => $harga ? $harga->persentase_kenaikan_harga : 0
-        //     ]);
-        // });
-
-        // Keter 2
-            // Route::get('/ketersediaan-kamar/{tanggal_check_in}/{tanggal_check_out}/{id_jenis_kamar}', function ($tanggal_check_in, $tanggal_check_out, $id_jenis_kamar) {
-
-            //     // Validasi input sederhana
-            //     if (!strtotime($tanggal_check_in) || !strtotime($tanggal_check_out) || $tanggal_check_in >= $tanggal_check_out) {
-            //         return response()->json(['error' => 'Tanggal tidak valid'], 400);
-            //     }
-
-            //     if (!is_numeric($id_jenis_kamar)) {
-            //         return response()->json(['error' => 'ID jenis kamar tidak valid'], 400);
-            //     }
-
-            //     $checkIN = Carbon::parse($tanggal_check_in)->format('Y-m-d');
-
-            //     // Ambil diskon
-            //     $diskon = Diskon::where('id_jenis_kamar', $id_jenis_kamar)
-            //         ->whereDate('tanggal_mulai', '<=', $checkIN)
-            //         ->whereDate('tanggal_berakhir', '>=', $checkIN)
-            //         ->first();
-
-            //     // Ambil harga
-            //     $harga = Harga::where('id_jenis_kamar', $id_jenis_kamar)
-            //         ->whereDate('tanggal_mulai', '<=', $checkIN)
-            //         ->whereDate('tanggal_berakhir', '>=', $checkIN)
-            //         ->first();
-
-            //     // Ambil total kamar
-            //     $total_kamar = DB::table('kamar')
-            //         ->where('id_jenis_kamar', $id_jenis_kamar)
-            //         ->where('status_kamar', 'tersedia')
-            //         ->count();
-
-            //     $kamar = Kamar::with('jenisKamar')->where('id_jenis_kamar', $id_jenis_kamar)->first();
-
-            //     if (!$kamar) {
-            //         return response()->json(['error' => 'ID jenis kamar tidak ditemukan'], 400);
-            //     }
-
-            //     // Array hasil ketersediaan
-            //     $ketersediaan_per_hari = [];
-            //     $total_akumulasi_kamar = 0;
-
-            //     $tanggal_mulai = Carbon::parse($tanggal_check_in);
-            //     $tanggal_selesai = Carbon::parse($tanggal_check_out);
-
-            //     for ($tanggal = clone $tanggal_mulai; $tanggal < $tanggal_selesai; $tanggal->modify('+1 day')) {
-
-            //         Carbon::setLocale('id');
-            //         $tglID = $tanggal->translatedFormat('d F Y');
-            //         $tgl = $tanggal->format('Y-m-d');
-
-            //         // Hitung total kamar yang sedang dipesan pada tanggal ini
-            //         $reservasi_aktif = Reservasi::where('id_jenis_kamar', $id_jenis_kamar)
-            //             ->whereIn('status_reservasi', ['dipesan', 'check-in']) // Status aktif
-            //             ->whereDate('tanggal_check_in', '<=', $tgl)
-            //             ->whereDate('tanggal_check_out', '>', $tgl) // Masih menginap di tanggal ini
-            //             ->sum('jumlah_kamar');
-
-            //         // Kamar tersisa = total - kamar terpakai
-            //         $kamar_tersedia = max($total_kamar - $reservasi_aktif, 0);
-
-            //         $ketersediaan_per_hari[] = [
-            //             'tanggal' => $tgl,
-            //             'tanggal_ID' => $tglID,
-            //             'jenis_kamar' => $kamar->jenisKamar->tipe_kamar . ' - '. $kamar->jenisKamar->jenis_ranjang,
-            //             'total_kamar' => $total_kamar,
-            //             'kamar_terpakai' => $reservasi_aktif,
-            //             'kamar_tersedia' => $kamar_tersedia
-            //         ];
-
-            //         $total_akumulasi_kamar += $kamar_tersedia;
-            //     }
-
-            //     $hargaDasar = $kamar->harga_kamar;
-            //     $hargaKhusus = $harga ? $hargaDasar * (1 + ($harga->persentase_kenaikan_harga / 100)) : null;
-
-            //     $totalHarga = $diskon 
-            //         ? ($hargaKhusus 
-            //             ? $hargaKhusus * (1 - ($diskon->persentase / 100)) 
-            //             : $hargaDasar * (1 - ($diskon->persentase / 100))) 
-            //         : ($harga 
-            //             ? $hargaDasar * (1 + ($harga->persentase_kenaikan_harga / 100)) 
-            //             : $hargaDasar);
-
-            //     return response()->json([
-            //         'harga' => number_format($totalHarga, 2, '.', ''),
-            //         'ketersediaan_per_hari' => $ketersediaan_per_hari,
-            //         'total_akumulasi_kamar' => $total_akumulasi_kamar,
-            //         'id_diskon' => $diskon ? $diskon->id : null,
-            //         'persentase_diskon' => $diskon ? $diskon->persentase : 0,
-            //         'id_harga' => $harga ? $harga->id : null,
-            //         'persentase_kenaikan_harga' => $harga ? $harga->persentase_kenaikan_harga : 0
-            //     ]);
-            // });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        // Di table Kamar
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // Di table Kamar old
         Route::get('/ketersediaan/{tanggal_check_in}/{tanggal_check_out}/{id_jenis_kamar}', function ($tanggal_check_in, $tanggal_check_out, $id_jenis_kamar) {
 
 
@@ -1402,6 +508,97 @@ Route::middleware(['auth','verified','proses'])->group(function(){
             ]);
 
         });
+
+        // Di table Kamar new
+        Route::get('/ketersediaan-new/{tanggal_check_in}/{tanggal_check_out}/{id_jenis_kamar}', function ($tanggal_check_in, $tanggal_check_out, $id_jenis_kamar) {
+
+
+            // Validasi input sederhana
+            if (!strtotime($tanggal_check_in) || !strtotime($tanggal_check_out) || $tanggal_check_in >= $tanggal_check_out) {
+                return response()->json(['error' => 'Tanggal tidak valid'], 400);
+            }
+        
+            if (!is_numeric($id_jenis_kamar)) {
+                return response()->json(['error' => 'ID jenis kamar tidak valid'], 400);
+            }
+
+            
+
+        
+            // Ambil total kamar yang tersedia untuk jenis kamar tertentu
+            $total_kamar = DB::table('kamar')
+                ->where('id_jenis_kamar', $id_jenis_kamar)
+                ->where('status_kamar', 'tersedia') // Hanya kamar yang tersedia
+                ->count();
+
+            $kamar = Kamar::with('jenisKamar')->where('id_jenis_kamar', $id_jenis_kamar)->first();
+
+            if (!$kamar) {
+                return response()->json(['error' => 'ID jenis kamar tidak ditemukan'], 400);
+            }
+        
+            // Buat array untuk menyimpan ketersediaan per hari
+            $ketersediaan_per_hari = [];
+            $total_akumulasi_kamar = 0; // Menyimpan total akumulasi kamar
+
+
+
+            $tanggal_mulai = Carbon::parse($tanggal_check_in);
+            $tanggal_selesai = Carbon::parse($tanggal_check_out);
+
+            for ($tanggal = clone $tanggal_mulai; $tanggal <= $tanggal_selesai; $tanggal->addDay()) { 
+                Carbon::setLocale('id');
+                $tglID = $tanggal->translatedFormat('d F Y');
+                $tgl = $tanggal->format('Y-m-d');
+
+
+
+
+                // Hitung jumlah kamar yang sudah dipesan di tanggal ini
+                $reservasi_aktif = DB::table('reservasi')
+                ->join('pesanan', 'reservasi.id', '=', 'pesanan.id_reservasi')  // Menyambungkan tabel reservasi dan pesanan
+                ->join('kamar', 'pesanan.id_kamar', '=', 'kamar.id')  // Menyambungkan pesanan dan kamar
+                ->join('jenis_kamar', 'kamar.id_jenis_kamar', '=', 'jenis_kamar.id')  // Menyambungkan kamar dan jenis_kamar
+                ->where('jenis_kamar.id', $id_jenis_kamar)  // Filter berdasarkan id_jenis_kamar
+                ->whereIn('reservasi.status_reservasi', ['dipesan', 'check_in'])  // Status reservasi aktif
+                ->whereDate('reservasi.tanggal_check_in', '<=', $tgl)  // Cek tanggal check-in
+                ->whereDate('reservasi.tanggal_check_out', '>', $tgl)  // Cek tanggal check-out
+                ->sum('reservasi.jumlah_kamar');  // Menghitung jumlah kamar
+            
+
+                $kamar_tersedia = $total_kamar - $reservasi_aktif;
+                $total_akumulasi_kamar += max($kamar_tersedia, 0); // Akumulasi kamar tersedia
+
+       
+                // sdasd
+                // Simpan hasil per hari
+                $ketersediaan_per_hari[] = [
+                    'tanggal_ID' => $tglID,
+                    'jenis_kamar' => $kamar->jenisKamar->tipe_kamar . ' - '. $kamar->jenisKamar->jenis_ranjang,
+                    'total_kamar' => $total_kamar,
+                    'kamar_tersedia' => $kamar_tersedia
+                ];
+
+                // Tambahkan ke total akumulasi kamar
+                // $total_akumulasi_kamar += $kamar_tersedia;
+            }
+
+
+
+            return response()->json([
+                'ketersediaan_per_hari' => $ketersediaan_per_hari,
+                'total_akumulasi_kamar' => $total_akumulasi_kamar
+            ]);
+
+        });
+
+
+
+
+
+
+
+
 
 
 
