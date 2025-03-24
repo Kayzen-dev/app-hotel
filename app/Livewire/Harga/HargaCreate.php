@@ -10,13 +10,14 @@ class HargaCreate extends Component
     public HargaForm $form;
 
     public $modalHargaCreate = false;
+    public $reset = false;
 
     public function save()
     {
         $this->validate();
 
+        $this->reset = true;
         $simpan = $this->form->store();
-
 
         is_null($simpan)
             ? $this->dispatch('notify', title: 'fail', message: 'Data gagal disimpan')

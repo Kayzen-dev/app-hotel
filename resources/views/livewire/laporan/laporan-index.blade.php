@@ -37,8 +37,8 @@
                 <dd class="mt-2 text-2xl font-semibold text-gray-900">Rp {{ number_format($pendapatanKamar, 0, ',', '.') }}</dd>
             </div>
             <div class="bg-red-50 p-6 rounded-xl">
-                <dt class="text-sm font-medium text-red-600">Total Diskon</dt>
-                <dd class="mt-2 text-2xl font-semibold text-gray-900">Rp {{ number_format($totalDiskon, 0, ',', '.') }}</dd>
+                <dt class="text-sm font-medium text-red-600">Total Reservasi</dt>
+                <dd class="mt-2 text-2xl font-semibold text-gray-900">{{ $totalReservasi }}</dd>
             </div>
             <div class="bg-green-50 p-6 rounded-xl">
                 <dt class="text-sm font-medium text-green-600">Total Pendapatan</dt>
@@ -65,7 +65,7 @@
                             @forelse($pendapatanPerJenisKamar as $item)
                                 <tr class="hover:bg-gray-50 transition-colors">
                                     <td class="px-6 py-4 font-medium text-gray-900">{{ $item->tipe_kamar }}</td>
-                                    <td class="px-6 py-4 text-right">Rp {{ number_format($item->total, 0, ',', '.') }}</td>
+                                    <td class="px-6 py-4 text-right text-gray-900">Rp {{ number_format($item->total, 0, ',', '.') }}</td>
                                 </tr>
                             @empty
                                 <tr>
@@ -129,10 +129,10 @@
                         @forelse ($data as $item)
                             <tr class="hover:bg-gray-50 transition-colors">
                                 <td class="px-6 py-4 font-medium text-gray-900">{{ $item->no_reservasi }}</td>
-                                <td class="px-6 py-4">{{ $item->tamu->nama }}</td>
-                                <td class="px-6 py-4">{{ $item->jumlah_kamar }} Kamar</td>
-                                <td class="px-6 py-4">{{ Carbon\Carbon::parse($item->tanggal_check_out)->isoFormat('D MMM Y') }}</td>
-                                <td class="px-6 py-4 text-right">Rp {{ number_format($item->total_harga, 0, ',', '.') }}</td>
+                                <td class="px-6 py-4 text-gray-900">{{ $item->tamu->nama }}</td>
+                                <td class="px-6 py-4 text-gray-900">{{ $item->jumlah_kamar }} Kamar</td>
+                                <td class="px-6 py-4 text-gray-900">{{ Carbon\Carbon::parse($item->tanggal_check_out)->isoFormat('D MMM Y') }}</td>
+                                <td class="px-6 py-4 text-gray-900 text-right">Rp {{ number_format($item->total_harga, 0, ',', '.') }}</td>
                             </tr>
                         @empty
                             <tr>

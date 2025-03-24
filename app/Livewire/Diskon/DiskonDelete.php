@@ -3,6 +3,7 @@
 namespace App\Livewire\Diskon;
 
 use App\Models\Diskon;
+use App\Models\Pesanan;
 use Livewire\Component;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Locked;
@@ -30,6 +31,14 @@ class DiskonDelete extends Component
 
     public function del()
     {
+        $diskon = Pesanan::where('id_diskon', $this->id)->get();
+
+        if ($diskon->isNotEmpty()) {
+            $this->dispatch('notify', title: 'fail', message: 'Data gagal dihapus, harga sedang digunakan');
+            $this->modalDiskonDelete = false;
+            return;
+        }
+        
         $del = Diskon::destroy($this->id);
 
         $del

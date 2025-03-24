@@ -34,31 +34,6 @@ Route::middleware(['auth','verified','proses'])->group(function(){
     
 
     Route::get('/pemilik', function () {
-        return view('pemilik.index');
-    })->middleware('role:pemilik')->name('pemilik');
-
-
-    // Route::get('/resepsionis', function () {
-    //     $totalKamar = Kamar::count();
-    //     $totalReservasi = Reservasi::count();
-    //     $totalKeluhan = Keluhan::count();
-    //     $kamarDipesan = Kamar::where('status_kamar', 'terisi')->count();
-
-    //     $tanggalHariIni = Carbon::today();
-
-    //     $kamarTersedia = Kamar::where('status_kamar', 'tersedia')->count();
-    //     $jumlahTamu = Tamu::count();
-    //     $jumlahKaryawan = Karyawan::count();
-    //     $totalPembayaran = Pembayaran::sum('jumlah_pembayaran');
-
-    //     return view('resepsionis.index',compact(
-    //         'totalKamar', 'totalReservasi', 'totalKeluhan', 
-    //         'kamarDipesan', 'kamarTersedia', 'jumlahTamu', 
-    //         'jumlahKaryawan', 'totalPembayaran'
-    //     ));
-    // })->middleware('role:resepsionis')->name('resepsionis');
-
-    Route::get('/resepsionis', function () {
         $today = now()->format('Y-m-d');
         
         $data = [
@@ -90,7 +65,43 @@ Route::middleware(['auth','verified','proses'])->group(function(){
                                         ->sum('jumlah_pembayaran')
         ];
     
-        return view('resepsionis.index', $data);
+        return view('pemilik.index', $data);
+    })->middleware('role:pemilik')->name('pemilik');
+
+
+    Route::get('/resepsionis', function () {
+        // $today = now()->format('Y-m-d');
+        
+        // $data = [
+        //     // Statistik Utama
+        //     'totalKamar' => Kamar::count(),
+        //     'kamarTersedia' => Kamar::where('status_kamar', 'tersedia')->count(),
+        //     'reservasiHariIni' => Reservasi::whereDate('tanggal_check_in', $today)->count(),
+        //     'tamuCheckIn' => Reservasi::whereDate('tanggal_check_in', $today)
+        //                       ->where('status_reservasi', 'check_in')->count(),
+            
+        //     // Data Terkini
+        //     'reservasiTerbaru' => Reservasi::with('tamu')
+        //                             ->orderBy('created_at', 'desc')
+        //                             ->take(5)
+        //                             ->get(),
+        //     'keluhanAktif' => Keluhan::where('status_keluhan', 'diproses')
+        //                        ->orderBy('created_at', 'desc')
+        //                        ->take(5)
+        //                        ->get(),
+            
+        //     // Statistik Tambahan
+        //     'totalDiskonAktif' => Diskon::where('tanggal_mulai', '<=', $today)
+        //                           ->where('tanggal_berakhir', '>=', $today)
+        //                           ->count(),
+        //     'kamarPerbaikan' => Kamar::where('status_kamar', 'perbaikan')->count(),
+        //     // 'occupancyRate' => round((Reservasi::whereDate('tanggal_check_in', $today)
+        //     //                         ->count() / Kamar::count()) * 100, 2),
+        //     'totalPendapatanHariIni' => Pembayaran::whereDate('created_at', $today)
+        //                                 ->sum('jumlah_pembayaran')
+        // ];
+    
+        return view('resepsionis.index');
     })->middleware('role:resepsionis')->name('resepsionis');
     
 
@@ -100,6 +111,7 @@ Route::middleware(['auth','verified','proses'])->group(function(){
 
         Route::get('/laporan', function () {
             return view('pemilik.laporan');
+
         })->name('pemilik.laporan.index');
 
         Route::get('/riwayat', function () {
@@ -114,13 +126,13 @@ Route::middleware(['auth','verified','proses'])->group(function(){
         })->name('export.user');
  
  
-                Route::get('/export-users-pdf', function() {
- 
-                    $users = App\Models\User::query()->with('roles')->get();
-        
-                // Kirim data ke view
-                $pdf = Pdf::loadView('Pdf.users', compact('users'));
-        
+            Route::get('/export-users-pdf', function() {
+
+                $users = App\Models\User::query()->with('roles')->get();
+    
+            // Kirim data ke view
+            $pdf = Pdf::loadView('Pdf.users', compact('users'));
+    
                 // Unduh file PDF
                 return $pdf->download('data_akun.pdf');
              })->name('export-users-pdf');
@@ -228,7 +240,7 @@ Route::middleware(['auth','verified','proses'])->group(function(){
         });
 
 
-        // keter 9 testing perhari ini bagus ini paling bagus
+        // Di Reservasi new in use
         Route::get('/ketersediaan-kamar/{tanggal_check_in}/{tanggal_check_out}/{id_jenis_kamar}/{jumlah_kamar}', function ($tanggal_check_in, $tanggal_check_out, $id_jenis_kamar, $jumlah_kamar) {
             // Validasi input
             if (!strtotime($tanggal_check_in) || !strtotime($tanggal_check_out) || $tanggal_check_in >= $tanggal_check_out) {
@@ -384,66 +396,6 @@ Route::middleware(['auth','verified','proses'])->group(function(){
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         // Di table Kamar old
         Route::get('/ketersediaan/{tanggal_check_in}/{tanggal_check_out}/{id_jenis_kamar}', function ($tanggal_check_in, $tanggal_check_out, $id_jenis_kamar) {
 
@@ -536,11 +488,38 @@ Route::middleware(['auth','verified','proses'])->group(function(){
             if (!$kamar) {
                 return response()->json(['error' => 'ID jenis kamar tidak ditemukan'], 400);
             }
+
+            $checkIN = Carbon::parse($tanggal_check_in)->format('Y-m-d');
+
         
             // Buat array untuk menyimpan ketersediaan per hari
             $ketersediaan_per_hari = [];
             $total_akumulasi_kamar = 0; // Menyimpan total akumulasi kamar
 
+            // Ambil diskon jika ada
+            $diskon = DB::table('diskon')
+                ->where('id_jenis_kamar', $id_jenis_kamar)
+                ->whereDate('tanggal_mulai', '<=', $checkIN)
+                ->whereDate('tanggal_berakhir', '>=', $checkIN)
+                ->first();
+
+            // Ambil harga khusus jika ada
+            $harga = DB::table('harga')
+                ->where('id_jenis_kamar', $id_jenis_kamar)
+                ->whereDate('tanggal_mulai', '<=', $checkIN)
+                ->whereDate('tanggal_berakhir', '>=', $checkIN)
+                ->first();
+
+            // Harga Dasar
+            $hargaDasar = $kamar->harga_kamar;
+
+            // Harga Khusus jika ada kenaikan harga
+            $hargaKhusus = $harga ? $hargaDasar * (1 + ($harga->persentase_kenaikan_harga / 100)) : null;
+
+            // Hitung harga akhir dengan diskon
+            $totalHarga = $diskon 
+                ? ($hargaKhusus ? $hargaKhusus * (1 - ($diskon->persentase / 100)) : $hargaDasar * (1 - ($diskon->persentase / 100)))
+                : ($hargaKhusus ?? $hargaDasar);
 
 
             $tanggal_mulai = Carbon::parse($tanggal_check_in);
@@ -576,7 +555,12 @@ Route::middleware(['auth','verified','proses'])->group(function(){
                     'tanggal_ID' => $tglID,
                     'jenis_kamar' => $kamar->jenisKamar->tipe_kamar . ' - '. $kamar->jenisKamar->jenis_ranjang,
                     'total_kamar' => $total_kamar,
-                    'kamar_tersedia' => $kamar_tersedia
+                    'kamar_tersedia' => $kamar_tersedia,
+                    'harga_kamar' => number_format($totalHarga, 2, '.', ''),
+                    'id_diskon' => $diskon ? $diskon->id : null,
+                    'persentase_diskon' => $diskon ? $diskon->persentase : 0,
+                    'id_harga' => $harga ? $harga->id : null,
+                    'persentase_kenaikan_harga' => $harga ? $harga->persentase_kenaikan_harga : 0
                 ];
 
                 // Tambahkan ke total akumulasi kamar
@@ -591,13 +575,6 @@ Route::middleware(['auth','verified','proses'])->group(function(){
             ]);
 
         });
-
-
-
-
-
-
-
 
 
 
@@ -622,7 +599,7 @@ Route::middleware(['auth','verified','proses'])->group(function(){
                 'emailTamu' => $resev->tamu->email,
                 'teleponTamu' => $resev->tamu->no_tlpn,
                 'invoiceNumber' => 'INV' . str_pad($resev->tamu->id, 3, '0', STR_PAD_LEFT) . date('Ymd', strtotime($resev->tanggal_check_in)),
-                'invoiceDate' => $resev->tanggal_check_in,
+                'invoiceDate' => now()->format('Y-m-d'),
                 'jumlahKamar' => $resev->jumlah_kamar,
                 'total_harga' => $resev->total_harga,
                 'denda' => $resev->denda,
@@ -642,7 +619,6 @@ Route::middleware(['auth','verified','proses'])->group(function(){
             $pesanan = $resev->pesanan->map(function ($item) {
                 return [
                     'jenisKamar' => $item['kamar']['jenisKamar']['tipe_kamar'] . ' - ' . $item['kamar']['jenisKamar']['jenis_ranjang'],
-                    'no_kamar' => $item['kamar']['no_kamar'],
                     'harga_kamar' => $item['harga_kamar'],
                     'harga_akhir' => $item['harga_akhir'],
                     'jumlah_malam' => $item['jumlah_malam'],
@@ -657,9 +633,6 @@ Route::middleware(['auth','verified','proses'])->group(function(){
         })->name('resep.invoice');
         
 
-
-
-    
         
 
 

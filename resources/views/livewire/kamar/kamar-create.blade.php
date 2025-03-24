@@ -1,4 +1,5 @@
 <div x-data="kamarRealtime()" x-init="init()">
+
     <x-secondary-button @click="$wire.set('modalKamarCreate', true)">
         Tambah Kamar
     </x-secondary-button>

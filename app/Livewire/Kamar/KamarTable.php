@@ -19,6 +19,7 @@ class KamarTable extends Component
     public $paginate = 5; // Jumlah data per halaman
     public $sortBy = 'kamar.id'; // Kolom default untuk pengurutan
     public $sortDirection = 'desc'; // Arah pengurutan default
+    public $idJenisKamar;
 
     // Realtime proses
     #[On('dispatch-kamar-create-save')]
@@ -31,6 +32,7 @@ class KamarTable extends Component
             'data' => Kamar::where('id', 'like', '%' . $this->form->id . '%')
                 ->with(['jenisKamar'])
                 ->where('no_kamar', 'like', '%' . $this->form->no_kamar . '%')
+                ->where('id_jenis_kamar', 'like', '%' . $this->idJenisKamar . '%')
                 ->where('status_kamar', 'like', '%' . $this->form->status_kamar . '%')
                 ->orderBy($this->sortBy, $this->sortDirection)
                 ->paginate($this->paginate),

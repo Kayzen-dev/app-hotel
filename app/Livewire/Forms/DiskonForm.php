@@ -27,12 +27,15 @@ class DiskonForm extends Form
     #[Validate('required', message: 'Jenis Kamar wajib dipilih')]
     public $id_jenis_kamar;
 
+    public $reset = false;
+
 
     public function resetData(){
         $this->kode_diskon = null;
         $this->persentase = null;
         $this->tanggal_mulai = null;
         $this->tanggal_berakhir = null;
+        $this->reset = true;
     }
 
 
@@ -58,6 +61,20 @@ class DiskonForm extends Form
             'tanggal_berakhir' => $this->tanggal_berakhir,
             'id_jenis_kamar' => $this->id_jenis_kamar
         ]);
+        
+        // $this->resetData();
+
+        // return $diskon;
+
+
+        // dd([
+        //         'kode_diskon' => $this->kode_diskon,
+        //         'persentase' => $this->persentase,
+        //         'tanggal_mulai' => $this->tanggal_mulai,
+        //         'tanggal_berakhir' => $this->tanggal_berakhir,
+        //         'id_jenis_kamar' => $this->id_jenis_kamar,
+        //         'reset' => $this->reset
+        // ]);
     }
 
     public function update($id)

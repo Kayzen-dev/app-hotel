@@ -13,6 +13,8 @@ class DiskonEdit extends Component
 
     public $modalDiskonEdit = false;
     
+    public $reset = false;
+
     #[On('dispatch-diskon-table-edit')]
     public function set_Diskon(Diskon $id)
     {
@@ -22,6 +24,8 @@ class DiskonEdit extends Component
 
     public function edit()
     {
+        $this->reset = true;
+
         $update = $this->form->update($this->form->id);
 
         is_null($update)

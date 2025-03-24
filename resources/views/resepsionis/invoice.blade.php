@@ -71,9 +71,8 @@
     
         <table class="w-full border-collapse">
             <thead>
-                <tr class="bg-gray-200">
+                <tr>
                     <th class="p-2 text-gray-700">Kamar</th>
-                    <th class="p-2 text-gray-700">No. Kamar</th>
                     <th class="p-2 text-gray-700">Durasi</th>
                     <th class="p-2 text-gray-700">Harga/Malam</th>
                     <th class="p-2 text-gray-700">Total</th>
@@ -84,7 +83,6 @@
                 @foreach ($invoiceData['invoice'] as $item)
                 <tr class="text-center">
                     <td class="p-2 text-gray-700">{{ $item['jenisKamar'] }}</td>
-                    <td class="p-2 text-gray-700">{{ $item['no_kamar'] }}</td>
                     <td class="p-2 text-gray-700">{{ $item['jumlah_malam'] }} Malam</td>
                     <td class="p-2 text-gray-700">Rp {{ number_format($item['harga_akhir'], 0, ',', '.') }}</td>
                     <td class="p-2 text-gray-700">Rp {{ number_format($item['subtotal'], 0, ',', '.') }}</td>

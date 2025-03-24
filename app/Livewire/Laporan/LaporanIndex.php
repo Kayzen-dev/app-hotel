@@ -19,6 +19,7 @@ class LaporanIndex extends Component
     public $totalPendapatan = 0;
     public $pendapatanKamar = 0;
     public $totalDiskon = 0;
+    public $totalReservasi = 0;
     public $pendapatanPerJenisKamar = [];
     public $revPar = 0;
     public $adr = 0;
@@ -33,6 +34,20 @@ class LaporanIndex extends Component
     {
         $this->tanggalMulai = Carbon::now()->startOfMonth()->toDateString();
         $this->tanggalSelesai = Carbon::now()->endOfMonth()->toDateString();
+        $this->totalReservasi = Reservasi::where(function ($query) {
+            // Memeriksa jika tanggal_check_in dalam rentang bulan ini dan status bukan "batal"
+            $query->whereBetween('tanggal_check_in', [$this->tanggalMulai, $this->tanggalSelesai])
+                  ->where('status_reservasi', '!=', 'batal') // status bukan "batal"
+                  
+                  // Kondisi OR: Jika tanggal_check_out dalam rentang bulan ini
+                  ->orWhereBetween('tanggal_check_out', [$this->tanggalMulai, $this->tanggalSelesai])
+                  
+                  // Kondisi OR lainnya: jika reservasi mencakup sebagian dari bulan ini (tanggal_check_in sebelum akhir bulan dan tanggal_check_out setelah awal bulan)
+                  ->orWhere(function ($query) {
+                      $query->where('tanggal_check_in', '<=', $this->tanggalSelesai)
+                            ->where('tanggal_check_out', '>=', $this->tanggalMulai);
+                  });
+        })->count();
         $this->hitungTotalPendapatan();
     }
 
@@ -92,6 +107,8 @@ class LaporanIndex extends Component
             : 0;
 
         $this->totalPendapatan = $this->pendapatanKamar;
+
+
     }
 
     public function render()

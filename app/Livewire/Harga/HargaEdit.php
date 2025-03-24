@@ -12,6 +12,7 @@ class HargaEdit extends Component
     public HargaForm $form;
 
     public $modalHargaEdit = false;
+    public $reset = false;
     
     #[On('dispatch-harga-table-edit')]
     public function set_Harga(Harga $id)
@@ -22,6 +23,7 @@ class HargaEdit extends Component
 
     public function edit()
     {
+        $this->reset = true;
         $update = $this->form->update($this->form->id);
 
         is_null($update)

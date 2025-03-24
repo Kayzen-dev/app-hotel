@@ -75,7 +75,7 @@
         </div> --}}
 
         <!-- Daftar nomor kamar -->
-        {{-- <div class="mt-3 pl-9">
+         {{-- <div class="mt-3 pl-9">
             <div class="font-medium text-emerald-700 mb-2">Kamar Tersedia:</div>
             <ul class="grid grid-cols-2 gap-x-4 gap-y-2">
                 <template x-for="(kamar, index) in no_kamar" :key="index">
@@ -84,7 +84,7 @@
                     </li>
                 </template>
             </ul>
-        </div> --}}
+        </div>  --}}
 
 </div>
 
@@ -309,11 +309,11 @@
                     await this.fetchData();
                     this.setupWatchers();
                     this.resetForm();
-                    console.log('Reset:', this.reset);
-                    console.log('Tamu:', this.selectedTamu);
-                    console.log('in:', this.tanggal_check_in);
-                    console.log('out:', this.tanggal_check_out);
-                    console.log('Succ:', this.isSuccess);
+                    // console.log('Reset:', this.reset);
+                    // console.log('Tamu:', this.selectedTamu);
+                    // console.log('in:', this.tanggal_check_in);
+                    // console.log('out:', this.tanggal_check_out);
+                    // console.log('Succ:', this.isSuccess);
                 },
     
                 // Fetch Data
@@ -451,9 +451,9 @@
 
                     // console.log(this.reset);
                     // console.log(this.isSuccess);
-                    console.log('Tamu:', this.selectedTamu);
-                    console.log('Suc:', this.isSuccess);
-                    console.log('res:', this.reset);
+                    // console.log('Tamu:', this.selectedTamu);
+                    // console.log('Suc:', this.isSuccess);
+                    // console.log('res:', this.reset);
                     
                     
                 }
