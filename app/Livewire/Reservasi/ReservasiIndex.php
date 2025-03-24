@@ -38,7 +38,8 @@ class ReservasiIndex extends Component
     public $jumlahHari;
     public $bayarDenda = false;
     public $bayarKedua;
-
+    public $jamCheckIn;
+    public $jamCheckOut;
 
     public $idTamu;
     public $alamatTamu;
@@ -183,9 +184,11 @@ class ReservasiIndex extends Component
             $this->jumlahPembayaran = $resev->pembayaran ? $resev->pembayaran->jumlah_pembayaran : null;
             $this->kembalian = $resev->pembayaran ? $resev->pembayaran->kembalian : null;
             $this->user = $resev->pembayaran ? $resev->pembayaran->user->username : null;
-
-
+            $this->jamCheckIn = $resev->pembayaran ? $resev->pembayaran->created_at->format('H:i') : null;
+            $this->jamCheckOut = $resev->status_reservasi == 'check_out' ? $resev->updated_at->format('H:i') : null;
             // dd($this->user);
+
+            // dd($resev->pembayaran);
 
             
         } else {
@@ -309,7 +312,7 @@ class ReservasiIndex extends Component
                 $this->teleponTamu = $resev->tamu->no_tlpn;
                 $this->invoiceNumber = 'INV' . str_pad($resev->tamu->id, 3, '0', STR_PAD_LEFT) . date('Ymd', strtotime($resev->tanggal_check_in));
 
-                $this->invoiceDate = $resev->tanggal_check_in;
+                $this->invoiceDate = now()->format('Y-m-d');
 
 
 
@@ -352,7 +355,6 @@ class ReservasiIndex extends Component
                 $pesanan = $resev->pesanan->map(function ($item) {
                     return [
                         'jenisKamar' => $item['kamar']['jenisKamar']['tipe_kamar'] . ' - ' . $item['kamar']['jenisKamar']['jenis_ranjang'],
-                        'no_kamar' => $item['kamar']['no_kamar'],
                         'harga_kamar' => $item['harga_kamar'],
                         'harga_akhir' => $item['harga_akhir'],
                         'jumlah_malam' => $item['jumlah_malam'],
@@ -620,15 +622,16 @@ class ReservasiIndex extends Component
 
 
     public function submitSelesai(){
-        $selesai = Reservasi::find($this->id)->update(
-            [
-                'status_reservasi' => 'selesai'
-            ]
-        );
-
+        // Menggunakan Query Builder untuk memperbarui status_reservasi tanpa mengubah updated_at
+        $selesai = DB::table('reservasis')->where('id', $this->id)->update([
+            'status_reservasi' => 'selesai',
+            // Tidak menambahkan kolom updated_at di sini
+        ]);
+    
         is_null($selesai)
         ? $this->dispatch('notify', title: 'fail', message: 'Reservasi gagal diselesaikan')
         : $this->dispatch('notify', title: 'success', message: 'Reservasi berhasil diselesaikan');
+        
         $this->showModalSelesai = false;
     }
     

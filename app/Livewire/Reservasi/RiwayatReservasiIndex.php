@@ -33,6 +33,8 @@ class RiwayatReservasiIndex extends Component
     public $keterangan;
     public $Iketerangan;
     public $jumlahHari;
+    public $jamCheckIn;
+    public $jamCheckOut;
 
 
     public $idTamu;
@@ -179,7 +181,8 @@ class RiwayatReservasiIndex extends Component
             $this->jumlahPembayaran = $resev->pembayaran ? $resev->pembayaran->jumlah_pembayaran : null;
             $this->kembalian = $resev->pembayaran ? $resev->pembayaran->kembalian : null;
             $this->user = $resev->pembayaran ? $resev->pembayaran->user->username : null;
-
+            $this->jamCheckIn = $resev->pembayaran ? $resev->pembayaran->created_at->format('H:i:s') : null;
+            $this->jamCheckOut = $resev->status_reservasi == 'check_out' ? $resev->updated_at->format('H:i:s') : null;
 
             // dd($this->user);
 
@@ -193,8 +196,6 @@ class RiwayatReservasiIndex extends Component
 
 
 
-
-    
 
     public function INVOICE($id) 
     {
@@ -224,7 +225,9 @@ class RiwayatReservasiIndex extends Component
             $this->emailTamu = $resev->tamu->email;
             $this->teleponTamu = $resev->tamu->no_tlpn;
             $this->invoiceNumber = 'INV' . str_pad($resev->tamu->id, 3, '0', STR_PAD_LEFT) . date('Ymd', strtotime($resev->tanggal_check_in));
-            $this->invoiceDate = $resev->tanggal_check_in;
+
+            $this->invoiceDate = now()->format('Y-m-d');
+
 
 
 
@@ -266,7 +269,6 @@ class RiwayatReservasiIndex extends Component
             $pesanan = $resev->pesanan->map(function ($item) {
                 return [
                     'jenisKamar' => $item['kamar']['jenisKamar']['tipe_kamar'] . ' - ' . $item['kamar']['jenisKamar']['jenis_ranjang'],
-                    'no_kamar' => $item['kamar']['no_kamar'],
                     'harga_kamar' => $item['harga_kamar'],
                     'harga_akhir' => $item['harga_akhir'],
                     'jumlah_malam' => $item['jumlah_malam'],
@@ -284,8 +286,6 @@ class RiwayatReservasiIndex extends Component
         $this->showModalInvoice = true;
 
     }
-
-
     
     public function cetakInvoice() {
         return Redirect()->route('resep.invoice',['idRes' => $this->id]);

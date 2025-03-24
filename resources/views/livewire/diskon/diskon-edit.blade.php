@@ -1,4 +1,4 @@
-<div  x-data="diskon()" x-init="init()">
+<div  x-data="diskon()">
 
   <x-dialog-modal wire:model.live="modalDiskonEdit" :id="'modal-diskon-edit'" submit="edit">
       <x-slot name="title">
@@ -31,12 +31,12 @@
             <div class="grid grid-cols-2 gap-4">
                 <div>
                     <label for="tanggal_mulai" class="label">Tanggal Mulai Diskon</label>
-                    <input type="date" wire:model="form.tanggal_mulai" x-model="tanggalMulai" @change="validateTanggal" id="tanggal_mulai" required class="input input-bordered text-gray-300 w-full">
+                    <input type="date" wire:model="form.tanggal_mulai" x-model="tanggalMulai" @change="validateTanggal()" id="tanggal_mulai" required class="input input-bordered text-gray-300 w-full">
                     <x-input-form-error for="form.tanggal_mulai" class="mt-1" />
                 </div>
                 <div>
                     <label for="tanggal_berakhir" class="label">Tanggal Berakhir Diskon</label>
-                    <input type="date" wire:model="form.tanggal_berakhir" x-model="tanggalBerakhir" @change="validateTanggal" id="tanggal_berakhir" required class="input input-bordered text-gray-300 w-full">
+                    <input type="date" wire:model="form.tanggal_berakhir" x-model="tanggalBerakhir" @change="validateTanggal()" id="tanggal_berakhir" required class="input input-bordered text-gray-300 w-full">
                     <x-input-form-error for="form.tanggal_berakhir" class="mt-1" />
                 </div>
             </div>
@@ -92,19 +92,39 @@
             tanggalBerakhir:  @entangle('form.tanggal_berakhir'), // State untuk tanggal berakhir
             selectedJenisKamar: '', // Variable untuk memilih jenis kamar
             jenisKamarList: [], // Daftar jenis kamar yang diambil dari server
+            reset: @entangle('reset'),
 
             validateTanggal() {
+                    // console.log(this.reset);
+                    
+                    // this->resetForm();
+                    // if (this.reset == false) {
+                      
+                    // }
                     // Pastikan kedua tanggal ada
-                    if (this.tanggalMulai && this.tanggalBerakhir) {
-                        const checkIn = new Date(this.tanggalMulai);
-                        const checkOut = new Date(this.tanggalBerakhir);
+                    const today = new Date();
+                        today.setHours(0, 0, 0, 0);
+                        const mulai = new Date(this.tanggalMulai);
 
-                        // Validasi jika tanggal berakhir tidak lebih besar dari tanggal mulai
-                        if (checkOut <= checkIn) {
-                            alert("Tanggal Berakhir Diskon harus lebih besar dari Tanggal Mulai!");
-                            this.tanggalBerakhir = ''; // Reset tanggal berakhir jika validasi gagal
+                        if (mulai < today && this.reset == false) {
+                        // this.errorMessage = "Tanggal Check-In tidak boleh lebih kecil dari hari ini!";
+                                alert("Tanggal Mulai diskon tidak boleh lebih kecil dari hari ini!");
+                                    this.tanggalMulai = '';
+                                    this.tanggalBerakhir = '';
+                                    return false;
                         }
-                    }
+
+                        if (this.tanggalMulai && this.tanggalBerakhir && this.reset == false) {
+                            const checkIn = new Date(this.tanggalMulai);
+                                const checkOut = new Date(this.tanggalBerakhir);
+    
+                                // Validasi jika tanggal berakhir tidak lebih besar dari tanggal mulai
+                                if (checkOut <= checkIn) {
+                                    alert("Tanggal Berakhir Diskon harus lebih besar dari Tanggal Mulai!");
+                                    this.tanggalBerakhir = ''; // Reset tanggal berakhir jika validasi gagal
+                                }
+                            }
+              
                 },
                 // Mengambil daftar jenis kamar dari API/Server
                 fetchJenisKamarList() {
@@ -124,8 +144,32 @@
                     this.fetchJenisKamarList();
                     setInterval(() => {
                             this.fetchJenisKamarList();
-                        }, 2000);
-                }
+                        }, 1000);
+
+                    // this.resetForm();
+                    // console.log("Reset Diskon :",this.reset);
+                },
+
+
+                                // Reset
+                // resetForm() {
+                //     if (!this.reset) return;
+                    
+                //     this.tanggalMulai = null;
+                //     this.tanggalBerakhir = null;
+                    
+                //     console.log("fungis reset create",this.reset);
+                //     console.log('in', this.tanggalMulai);
+                //     console.log('out', this.tanggalBerakhir);
+                //     this.reset = false;
+                    
+                //     // console.log(this.isSuccess);
+                //     // console.log('Tamu:', this.selectedTamu);
+                //     // console.log('Suc:', this.isSuccess);
+                //     // console.log('res:', this.reset);
+                    
+                    
+                // }
 
             };
     }

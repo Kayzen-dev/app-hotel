@@ -1,4 +1,4 @@
-<div  x-data="harga()" x-init="init()">
+<div  x-data="harga()">
 
     <x-dialog-modal wire:model.live="modalHargaEdit" :id="'modal-harga-edit'" submit="edit">
         <x-slot name="title">
@@ -34,13 +34,13 @@
 
                                 
                                 <div>
-                                    <label for="tanggal_mulai" class="label">Tanggal Mulai Diskon</label>
-                                    <input type="date" wire:model="form.tanggal_mulai" x-model="tanggalMulai" @change="validateTanggal" id="tanggal_mulai" required class="input input-bordered text-gray-300 w-full">
+                                    <label for="tanggal_mulai" class="label">Tanggal Mulai Harga</label>
+                                    <input type="date" wire:model="form.tanggal_mulai" x-model="tanggalMulai" @change="validateTanggal()" id="tanggal_mulai" required class="input input-bordered text-gray-300 w-full">
                                     <x-input-form-error for="form.tanggal_mulai" class="mt-1" />
                                 </div>
                                 <div>
-                                    <label for="tanggal_berakhir" class="label">Tanggal Berakhir Diskon</label>
-                                    <input type="date" wire:model="form.tanggal_berakhir" x-model="tanggalBerakhir" @change="validateTanggal" id="tanggal_berakhir" required class="input input-bordered text-gray-300 w-full">
+                                    <label for="tanggal_berakhir" class="label">Tanggal Berakhir Harga</label>
+                                    <input type="date" wire:model="form.tanggal_berakhir" x-model="tanggalBerakhir" @change="validateTanggal()" id="tanggal_berakhir" required class="input input-bordered text-gray-300 w-full">
                                     <x-input-form-error for="form.tanggal_berakhir" class="mt-1" />
                                 </div>
                                 
@@ -96,19 +96,33 @@ function harga() {
         tanggalBerakhir:  @entangle('form.tanggal_berakhir'), // State untuk tanggal berakhir
         selectedJenisKamar: '', // Variable untuk memilih jenis kamar
         jenisKamarList: [], // Daftar jenis kamar yang diambil dari server
+        reset: @entangle('reset'),
 
         validateTanggal() {
                 // Pastikan kedua tanggal ada
-                if (this.tanggalMulai && this.tanggalBerakhir) {
-                    const checkIn = new Date(this.tanggalMulai);
-                    const checkOut = new Date(this.tanggalBerakhir);
+                const today = new Date();
+                        today.setHours(0, 0, 0, 0);
+                        const mulai = new Date(this.tanggalMulai);
 
-                    // Validasi jika tanggal berakhir tidak lebih besar dari tanggal mulai
-                    if (checkOut <= checkIn) {
-                        alert("Tanggal Berakhir harga harus lebih besar dari Tanggal Mulai!");
-                        this.tanggalBerakhir = ''; // Reset tanggal berakhir jika validasi gagal
-                    }
-                }
+                        if (mulai < today && this.reset == false) {
+                        // this.errorMessage = "Tanggal Check-In tidak boleh lebih kecil dari hari ini!";
+                                alert("Tanggal Mulai harga tidak boleh lebih kecil dari hari ini!");
+                                    this.tanggalMulai = '';
+                                    this.tanggalBerakhir = '';
+                                    return false;
+                        }
+
+                        if (this.tanggalMulai && this.tanggalBerakhir && this.reset == false) {
+                            const checkIn = new Date(this.tanggalMulai);
+                                const checkOut = new Date(this.tanggalBerakhir);
+    
+                                // Validasi jika tanggal berakhir tidak lebih besar dari tanggal mulai
+                                if (checkOut <= checkIn) {
+                                    alert("Tanggal Berakhir harga harus lebih besar dari Tanggal Mulai!");
+                                    this.tanggalBerakhir = ''; // Reset tanggal berakhir jika validasi gagal
+                                }
+                            }
+
             },
             // Mengambil daftar jenis kamar dari API/Server
             fetchJenisKamarList() {
@@ -124,10 +138,34 @@ function harga() {
 
             init() {
                 this.fetchJenisKamarList();
+                // this.resetForm();
+
                 setInterval(() => {
                         this.fetchJenisKamarList();
-                    }, 3000);
-            }
+                    }, 1000);
+                    // console.log("Reset harga:",this.reset);
+                
+            },
+
+            // resetForm() {
+            //         if (!this.reset) return;
+                    
+            //         this.tanggalMulai = null;
+            //         this.tanggalBerakhir = null;
+            //         this.reset = false;
+
+            //         console.log("fungis reset create",this.reset);
+            //         console.log('in c', this.tanggalMulai);
+            //         console.log('out c', this.tanggalBerakhir);
+                    
+            //         // console.log(this.isSuccess);
+            //         // console.log('Tamu:', this.selectedTamu);
+            //         // console.log('Suc:', this.isSuccess);
+            //         // console.log('res:', this.reset);
+                    
+                    
+            //     }
+    
 
         };
 }

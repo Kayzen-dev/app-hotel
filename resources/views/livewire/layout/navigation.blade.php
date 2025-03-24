@@ -70,7 +70,7 @@ new class extends Component
                         </x-nav-link>
                  
                         <x-nav-link :href="route('pemilik.riwayat.index')" :active="request()->routeIs('pemilik.riwayat.index')" wire:navigate>
-                            {{ __('Riwayat Reservasi') }} 
+                            {{ __('Reservasi') }} 
                         </x-nav-link>
                     @endrole
 

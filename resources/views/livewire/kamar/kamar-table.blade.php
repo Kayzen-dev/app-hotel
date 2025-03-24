@@ -1,72 +1,115 @@
 <div wire:poll>
     
-    <div x-data="ketersediaan()" class="dropdown" x-init="init()">
-        <div tabindex="0" role="button" class="btn m-3">Ketersediaan Kamar</div>
-        <div tabindex="0" class="dropdown-content card card-compact bg-neutral text-gray-300 z-[1] w-[600px] p-2 shadow">
-            <div class="card-body p-3">
-                <div class="flex space-x-5 mb-1">
-                    <div>
-                        <label class="block text-sm p-2 font-medium">Tanggal Check In</label>
-                        <input type="date" x-model="tanggal_check_in" @change="validateTanggal(); getKetersediaanKamar()" class="input input-bordered input-md w-full">
-                    </div>
-                    <div>
-                        <label class="block text-sm p-2 font-medium">Tanggal Check Out</label>
-                        <input type="date" x-model="tanggal_check_out" @change="validateTanggal(); getKetersediaanKamar()" class="input input-bordered input-md w-full">
-                    </div>
-    
-                    <div>
-                        <label for="id_jenis_kamar" class="label text-white p-2 font-medium">Pilih Jenis Kamar</label>
-                        <select id="id_jenis_kamar" x-model="selectedJenisKamar" @change="getKetersediaanKamar()" 
-                            class="select text-gray-300 select-bordered w-full border-gray-100 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" required>
-                        <option value="">-- Pilih Jenis Kamar --</option>
-                        <template x-for="jenis in jenisKamarList" :key="jenis.id">
-                            <option :value="jenis.id" x-text="`${jenis.tipe_kamar} - ${jenis.jenis_ranjang}`"></option>
-                        </template>
-                    </select>
 
-                    </div>
-                </div>
+    <div x-data="ketersediaan()" x-init="init()" class="flex justify-between">
+
+        <div class="dropdown">
+            <div tabindex="0" role="button" class="btn m-3">Ketersediaan Kamar</div>
+            <div tabindex="0" class="dropdown-content card card-compact bg-neutral text-gray-300 z-[1] w-[600px] p-2 shadow">
+                <div class="card-body p-3">
+                    <div class="flex space-x-5 mb-1">
+                        <div>
+                            <label class="block text-sm p-2 font-medium">Tanggal Check In</label>
+                            <input type="date" x-model="tanggal_check_in" @change="validateTanggal(); getKetersediaanKamar()" class="input input-bordered input-md w-full">
+                        </div>
+                        <div>
+                            <label class="block text-sm p-2 font-medium">Tanggal Check Out</label>
+                            <input type="date" x-model="tanggal_check_out" @change="validateTanggal(); getKetersediaanKamar()" class="input input-bordered input-md w-full">
+                        </div>
+        
+                        <div>
+                            <label for="id_jenis_kamar" class="label text-white p-2 font-medium">Pilih Jenis Kamar</label>
+                            <select id="id_jenis_kamar" x-model="selectedJenisKamar" @change="getKetersediaanKamar()" 
+                                    class="select text-gray-300 select-bordered w-full border-gray-100 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" required>
+                                <option value="">-- Semua Jenis Kamar --</option>
+                                <template x-for="jenis in jenisKamarList" :key="jenis.id">
+                                    <option :value="jenis.id" x-text="`${jenis.tipe_kamar} - ${jenis.jenis_ranjang}`"></option>
+                                </template>
+                            </select>
     
-                <div class="flex flex-col items-center justify-center h-auto p-2">
-                    <!-- Tabel -->
-                    <div class="overflow-x-auto w-full">
-                        <div class="h-[100px] overflow-y-auto"> 
-                            <table class="table-auto w-full text-sm rounded-lg">
-                                <thead class="bg-gray-800">
-                                    <tr>
-                                        <th class="px-2 py-1 text-sm text-center">Tanggal</th>
-                                        <th class="px-2 py-1 text-sm text-center">Jenis Kamar</th>
-                                        <th class="px-2 py-1 text-sm text-center">Total Kamar</th>
-                                        <th class="px-2 py-1 text-sm text-center">Total Tersedia</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <template x-for="item in ketersediaan.ketersediaan_per_hari" :key="item.tanggal_ID">
-                                        <tr>
-                                            <td class="px-2 py-1 text-sm" x-text="item.tanggal_ID"></td>
-                                            <td class="px-2 py-1 text-sm" x-text="item.jenis_kamar"></td>
-                                            <td class="px-2 py-1 text-sm" x-text="item.total_kamar"></td>
-                                            <td class="px-2 py-1 text-sm" x-text="item.kamar_tersedia"></td>
-                                        </tr>
-                                    </template>
-                                </tbody>
-                            </table>
                         </div>
                     </div>
+        
+                    <div class="flex flex-col items-center justify-center h-auto p-2">
+                        <!-- Tabel -->
+                        <div class="overflow-x-auto w-full">
+                            <div class="h-[100px] overflow-y-auto"> 
     
-                    <!-- Total Tersedia -->
-                    <div class="flex justify-end w-full mt-4">
-                        <table class="w-1/2 text-right">
-                            <tr>
-                                <th class="px-2 py-1 text-gray-300 text-sm">Total Kamar Tersedia:</th>
-                                <td class="px-2 py-1 text-gray-300 font-bold text-lg" x-text="ketersediaan.total_akumulasi_kamar"></td>
-                            </tr>
-                        </table>
+                                <table class="table-auto w-full text-sm rounded-lg">
+                                    <thead class="bg-gray-800">
+                                        <tr>
+                                            <th class="px-2 py-1 text-sm text-center">Tanggal</th>
+                                            <th class="px-2 py-1 text-sm text-center">Jenis Kamar</th>
+                                            <th class="px-2 py-1 text-sm text-center">Total Kamar</th>
+                                            <th class="px-2 py-1 text-sm text-center">Total Tersedia</th>
+                                            <th class="px-2 py-1 text-sm text-center">Harga Kamar</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <template x-for="item in ketersediaan.ketersediaan_per_hari" :key="item.tanggal_ID">
+                                            <tr>
+                                                <td class="px-2 py-1 text-sm" x-text="item.tanggal_ID"></td>
+                                                <td class="px-2 py-1 text-sm" x-text="item.jenis_kamar"></td>
+                                                <td class="px-2 py-1 text-sm" x-text="item.total_kamar"></td>
+                                                <td class="px-2 py-1 text-sm" x-text="item.kamar_tersedia"></td>
+                                                <td class="px-2 py-1 text-sm">
+                                                        Rp <span x-text="formatRupiah(item.harga_kamar)"></span>
+                                                    <template x-if="item.persentase_diskon || item.persentase_kenaikan_harga">
+                                                        <div>
+                                                            <template x-if="item.persentase_diskon">
+                                                                <p class="text-xs">Diskon: 
+                                                                    <span class="text-red-600 f" x-text="'-' + round(item.persentase_diskon) + '%'"></span>
+                                                                </p>
+                                                            </template>
+                                                            <template x-if="item.persentase_kenaikan_harga">
+                                                                <p class="text-xs" >+ Kenaikan Harga: 
+                                                                    <span class="text-orange-600" x-text="'+' + round(item.persentase_kenaikan_harga) + '%'"></span>
+                                                                </p>
+                                                            </template>
+                                                        </div>
+                                                    </template>
+                                                </td>
+                                            </tr>
+                                        </template>
+                                    </tbody>
+                                </table>
+    
+    
+                            </div>
+                        </div>
+        
+                        <!-- Total Tersedia -->
+                        <div class="flex justify-end w-full mt-4">
+                            <table class="w-1/2 text-right">
+                                <tr>
+                                    <th class="px-2 py-1 text-gray-300 text-sm">Total Kamar Tersedia:</th>
+                                    <td class="px-2 py-1 text-gray-300 font-bold text-lg" x-text="ketersediaan.total_akumulasi_kamar"></td>
+                                </tr>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
+
+            
+        <div>
+            <div>
+                <label for="id_jenis_kamar" class="label text-white p-2 font-medium">Filter Jenis Kamar</label>
+                <select id="id_jenis_kamar" wire:model.live="idJenisKamar"
+                        class="select text-gray-300 select-bordered w-full border-gray-100 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" required>
+                    <option value="">-- Pilih Jenis Kamar --</option>
+                    <template x-for="jenis in jenisKamarList" :key="jenis.id">
+                        <option :value="jenis.id" x-text="`${jenis.tipe_kamar} - ${jenis.jenis_ranjang}`"></option>
+                    </template>
+                </select>
+            </div>
+        </div>
+
     </div>
+
+
+
 
     
 
@@ -178,6 +221,14 @@
                 ketersediaan_per_hari: [],
                 total_akumulasi_kamar: 0
             },
+
+            formatRupiah(angka) {
+                    return new Intl.NumberFormat("id-ID").format(angka || 0);
+                },
+    
+                round(value) {
+                    return Math.round(value);
+                },
 
             validateTanggal() {
                 const today = new Date();

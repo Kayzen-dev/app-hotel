@@ -10,6 +10,9 @@ class HargaForm extends Form
 {
     public ?Harga $harga = null;
     public $id;
+    public $reset = false;
+
+
     
 
     
@@ -48,13 +51,26 @@ class HargaForm extends Form
 
     public function store()
     {
-        return Harga::createHargaIfNotExists([
+        $harga = Harga::createHargaIfNotExists([
             'kode_harga' => $this->kode_harga,
             'persentase_kenaikan_harga' => $this->persentase_kenaikan_harga,
             'tanggal_mulai' => $this->tanggal_mulai,
             'tanggal_berakhir' => $this->tanggal_berakhir,
             'id_jenis_kamar' => $this->id_jenis_kamar
         ]);
+
+
+        return $harga;
+    }
+
+
+
+    public function resetData(){
+        $this->kode_harga = null;
+        $this->persentase_kenaikan_harga = null;
+        $this->tanggal_mulai = null;
+        $this->tanggal_berakhir = null;
+        $this->reset = true;
     }
 
     public function update($id)

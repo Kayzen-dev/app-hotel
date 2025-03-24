@@ -50,18 +50,24 @@
                 </td>
                 <td class="text-center">
                     <button class="btn btn-primary btn-sm" wire:click="detail({{ $item->id }})">Detail</button>
-                    @if ($item->status_reservasi != 'batal')
-                        <buttton class="btn btn-sm btn-primary" wire:click="INVOICE({{ $item->id }})">Invoice</buttton>
-                    @endif
 
-                    @if ($item->status_reservasi == 'dipesan')
-                    <buttton class="btn btn-sm btn-primary" wire:click="checkIn({{ $item->id }})">Check In</buttton>
-                    <buttton class="btn btn-sm btn-primary" wire:click="batal({{ $item->id }})" >Batalkan</buttton>
-                    @elseif ($item->status_reservasi == 'check_in')
-                        <buttton  class="btn btn-sm btn-primary" wire:click="checkOut({{ $item->id }})">Check Out</buttton>
-                    @elseif ($item->status_reservasi == 'check_out')
-                    <buttton class="btn btn-sm btn-primary" wire:click="selesai({{ $item->id }})">Selesaikan</buttton>
+                    
+
+                    @if (Auth::user()->hasRole('resepsionis'))
+                                @if ($item->status_reservasi != 'batal')
+                                <buttton class="btn btn-sm btn-primary" wire:click="INVOICE({{ $item->id }})">Invoice</buttton>
+                            @endif
+
+                                @if ($item->status_reservasi == 'dipesan')
+                                    <buttton class="btn btn-sm btn-primary" wire:click="checkIn({{ $item->id }})">Check In</buttton>
+                                            <buttton class="btn btn-sm btn-primary" wire:click="batal({{ $item->id }})" >Batalkan</buttton>
+                                            @elseif ($item->status_reservasi == 'check_in')
+                                                <buttton  class="btn btn-sm btn-primary" wire:click="checkOut({{ $item->id }})">Check Out</buttton>
+                                            @elseif ($item->status_reservasi == 'check_out')
+                                            <buttton class="btn btn-sm btn-primary" wire:click="selesai({{ $item->id }})">Selesaikan</buttton>
+                                        @endif
                     @endif
+                    
 
                 </td>
                 
@@ -200,7 +206,9 @@
                                                             </svg>
                                                             <span class="text-sm text-gray-600">Check-in</span>
                                                         </div>
-                                                        <span class="text-sm font-medium text-gray-900">{{ \Carbon\Carbon::parse($tanggal_check_in)->translatedFormat('d F Y'); }}</span>
+                                                        <span class="text-sm font-medium text-gray-900">{{ \Carbon\Carbon::parse($tanggal_check_in)->translatedFormat('d F Y'); }} @if ($jamCheckIn)
+                                                           , Jam : {{ $jamCheckIn }}
+                                                        @endif</span>
                                                     </div>
                                                     
                                                     <div class="flex justify-between items-center">
@@ -211,7 +219,11 @@
                                                             </svg>
                                                             <span class="text-sm text-gray-600">Check-out</span>
                                                         </div>
-                                                        <span class="text-sm font-medium text-gray-900">{{ \Carbon\Carbon::parse($tanggal_check_out)->translatedFormat('d F Y'); }}</span>
+                                                        <span class="text-sm font-medium text-gray-900">{{ \Carbon\Carbon::parse($tanggal_check_out)->translatedFormat('d F Y'); }}
+                                                         @if ($jamCheckOut)
+                                                         , Jam : {{ $jamCheckOut }}
+                                                        @endif
+                                                        </span>
                                                     </div>
 
                                                     <div class="flex justify-between items-center">
@@ -312,7 +324,7 @@
                                         <!-- Right Column - Payment Summary -->
                                         <div class="space-y-4">
                                             <div class="bg-white p-4 rounded-xl border border-gray-100">
-                                                <h4 class="text-sm font-semibold text-gray-600 mb-3">Detail Pembayaran</h4>
+                                                <h4 class="text-sm font-semibold text-gray-600 mb-3">Detail Harga</h4>
                                                 <div class="space-y-4">
                                             
                                                     <!-- Menampilkan Harga Awal -->
@@ -528,9 +540,8 @@
                                         
                                             <table class="w-full border-collapse">
                                                 <thead>
-                                                    <tr class="bg-gray-200">
+                                                    <tr>
                                                         <th class="p-2 text-gray-700">Kamar</th>
-                                                        <th class="p-2 text-gray-700">No. Kamar</th>
                                                         <th class="p-2 text-gray-700">Durasi</th>
                                                         <th class="p-2 text-gray-700">Harga/Malam</th>
                                                         <th class="p-2 text-gray-700">Total</th>
@@ -542,7 +553,6 @@
                                                     @foreach ($invoice as $item)
                                                         <tr class="text-center">
                                                             <td class="p-2 text-gray-700">{{ $item['jenisKamar'] }}</td>
-                                                            <td class="p-2 text-gray-700">{{ $item['no_kamar'] }}</td>
                                                             <td class="p-2 text-gray-700">{{ $item['jumlah_malam'] }} Malam</td>
                                                             <td class="p-2 text-gray-700">Rp {{ number_format($item['harga_akhir'], 0, ',', '.') }}</td>
                                                             <td class="p-2 text-gray-700">Rp {{ number_format($item['subtotal'], 0, ',', '.') }}</td>

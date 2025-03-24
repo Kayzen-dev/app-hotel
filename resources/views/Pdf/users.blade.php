@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Surat Masuk</title>
+    <title>Pengguna</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -50,7 +50,7 @@
 </head>
 <body>
     <div class="content">
-        <h3>Daftar Users Agenda Surat</h3>
+        <h3>Daftar Pengguna aplikasi hotel</h3>
         <table>
             <thead>
                 <tr>
