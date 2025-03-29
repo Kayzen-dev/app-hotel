@@ -384,7 +384,9 @@ class ReservasiIndex extends Component
                     $kamarId1 = json_decode($item['nomor_kamar'], true);
                 
                     // Ambil semua data kamar
-                    $kamar = Kamar::all(['id', 'no_kamar', 'status_no_kamar','status_pemesanan']);
+                    // $kamar = Kamar::all(['id', 'no_kamar', 'status_no_kamar','status_pemesanan']);
+                    $kamar = Kamar::where('id_jenis_kamar', $item['id_jenis_kamar'])
+              ->get(['id', 'no_kamar', 'status_no_kamar', 'status_pemesanan']);
                 
                     // Modifikasi status_no_kamar menjadi true jika id kamar ada dalam id_kamar
                     $kamarData = $kamar->map(function ($kamar) use ($kamarIds,$kamarId1) {
