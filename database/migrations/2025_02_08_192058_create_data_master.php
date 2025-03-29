@@ -56,6 +56,7 @@ return new class extends Migration
             $table->id();
             $table->string('tipe_kamar');
             $table->string('jenis_ranjang');
+            $table->integer('total_kamar');
             $table->timestamps();
         });
 
@@ -86,6 +87,8 @@ return new class extends Migration
             $table->id();
             $table->string('no_kamar')->unique();
             $table->enum('status_kamar', ['tersedia', 'terisi', 'perbaikan']);
+            $table->boolean('status_no_kamar')->default(false);
+            $table->boolean('status_pemesanan')->default(false);
             $table->foreignId('id_jenis_kamar')->constrained('jenis_kamar')->onDelete('cascade');
             $table->decimal('harga_kamar', 15, 2);
             $table->timestamps();

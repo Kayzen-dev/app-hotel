@@ -3,6 +3,8 @@
 namespace App\Livewire\Reservasi;
 
 use Carbon\Carbon;
+use App\Models\Kamar;
+use App\Models\Pesanan;
 use Livewire\Component;
 use App\Models\Reservasi;
 use App\Models\Pembayaran;
@@ -40,6 +42,7 @@ class ReservasiIndex extends Component
     public $bayarKedua;
     public $jamCheckIn;
     public $jamCheckOut;
+    public $nomorKamar = [];
 
     public $idTamu;
     public $alamatTamu;
@@ -150,22 +153,58 @@ class ReservasiIndex extends Component
             $this->jumlahHari = \Carbon\Carbon::parse($resev->tanggal_check_in)->diffInDays($resev->tanggal_check_out);
 
 
-            // Mapping data pesanan ke array
             $pesanan = $resev->pesanan->map(function ($item) {
-                return [
-                    'no_kamar' => $item['kamar']['no_kamar'], 
-                    'jenisKamar' => $item['kamar']['jenisKamar']['tipe_kamar'] . ' - ' . $item['kamar']['jenisKamar']['jenis_ranjang'],
-                    'harga_kamar' => $item['harga_kamar'],
-                    'harga_akhir' => $item['harga_akhir'],
-                    'jumlah_malam' => $item['jumlah_malam'],
-                    'persentase_diskon' =>  isset($item['diskon']) ? $item['diskon']['persentase'] : 0,
-                    'persentase_kenaikan_harga' => isset($item['harga']) ? $item['harga']['persentase_kenaikan_harga'] : 0,
-                    'subtotal' => $item['subtotal']
-                ];
-            });
-            
+                    return [
+                'id_pesanan' => $item['id'],
+                        'no_kamar' => $item['kamar']['no_kamar'], 
+                        'id_jenis_kamar' => $item['kamar']['id_jenis_kamar'],
+                        'jenisKamar' => $item['kamar']['jenisKamar']['tipe_kamar'] . ' - ' . $item['kamar']['jenisKamar']['jenis_ranjang'],
+                        'harga_kamar' => $item['harga_kamar'],
+                        'harga_akhir' => $item['harga_akhir'],
+                        'jumlah_malam' => $item['jumlah_malam'],
+                        'nomor_kamar' => $item['nomor_kamar'],
+                        'persentase_diskon' =>  isset($item['diskon']) ? $item['diskon']['persentase'] : 0,
+                        'persentase_kenaikan_harga' => isset($item['harga']) ? $item['harga']['persentase_kenaikan_harga'] : 0,
+                        'subtotal' => $item['subtotal']
+                    ];
+                });
+
+                // dd($pesanan);
+
             $this->pesanan = $pesanan;
             
+            $this->nomorKamar = $pesanan->mapWithKeys(function ($item) {
+                // Decode JSON untuk mendapatkan array id_kamar
+                $kamarIds = json_decode($item['nomor_kamar'], true);
+            
+                // Pastikan $kamarIds adalah array dan tidak kosong
+                if (is_array($kamarIds) && !empty($kamarIds)) {
+                    // Ambil semua data kamar yang ID-nya ada dalam $kamarIds
+                    $kamar = Kamar::whereIn('id', $kamarIds)->get(['id', 'no_kamar', 'status_no_kamar']);
+                } else {
+                    // Jika tidak ada ID kamar, inisialisasi $kamar sebagai koleksi kosong
+                    $kamar = collect();
+                }
+            
+                // Ambil hanya no_kamar dan status_no_kamar dari setiap kamar
+                $result = $kamar->map(function ($k) use ($item) {
+                    return [
+                'id_pesanan' => $item['id_pesanan'], // Menyimpan id_pesanan
+
+                        'no_kamar' => $k->no_kamar,
+                        'status_no_kamar' => $k->status_no_kamar,
+                        'status_pemesanan' => $k->status_pemesanan
+                    ];
+                });
+            
+                // Menggunakan id_pesanan sebagai kunci
+                return $result; // Pastikan id_pesanan ada dalam $item
+            });
+            
+            // dd($hargaAkhirList,$hargaDasarList);
+
+            // dd($this->nomorKamar);
+
 
 
             $this->hargaDasarList = $pesanan->mapWithKeys(function ($item) {
@@ -176,6 +215,8 @@ class ReservasiIndex extends Component
                 return [$item['no_kamar'] => floatval( $item['harga_akhir']) * $this->jumlahHari ]; // Akses no_kamar dan harga_akhir sebagai array key
             });
             
+
+          
             // dd($hargaAkhirList,$hargaDasarList);
 
 
@@ -198,7 +239,11 @@ class ReservasiIndex extends Component
         $this->showModalDetail = true;
     }
 
- 
+    
+        public function tutupCheckIn() {
+            $this->showModalCheckIn = false;
+            $this->nomorKamar = [];
+        }
 
 
         public function checkIn($id) 
@@ -226,6 +271,9 @@ class ReservasiIndex extends Component
                 $this->jumlahKamar = $resev->jumlah_kamar;
                 $this->total_harga = $resev->total_harga;
                 $this->denda = $resev->denda;
+
+                // $this->nomorKamar = Kamar::where('id_jenis_kamar', $resev->pesanan[])
+
                 if ($resev->status_reservasi == 'check_in') {
                     $this->status_reservasi = 'Check in';
                 }elseif ($resev->status_reservasi == 'check_out') {
@@ -240,21 +288,83 @@ class ReservasiIndex extends Component
                 // dd($this->total_harga);
     
                 // Mapping data pesanan ke array
-                $pesanan = $resev->pesanan->map(function ($item) {
+                $pesanan1 = $resev->pesanan->map(function ($item) {
                     return [
+                        'id_pesanan' => $item['id'],
                         'no_kamar' => $item['kamar']['no_kamar'], 
+                        'id_jenis_kamar' => $item['kamar']['id_jenis_kamar'],
                         'jenisKamar' => $item['kamar']['jenisKamar']['tipe_kamar'] . ' - ' . $item['kamar']['jenisKamar']['jenis_ranjang'],
                         'harga_kamar' => $item['harga_kamar'],
                         'harga_akhir' => $item['harga_akhir'],
                         'jumlah_malam' => $item['jumlah_malam'],
+                        'nomor_kamar' => $item['nomor_kamar'],
                         'persentase_diskon' =>  isset($item['diskon']) ? $item['diskon']['persentase'] : 0,
                         'persentase_kenaikan_harga' => isset($item['harga']) ? $item['harga']['persentase_kenaikan_harga'] : 0,
                         'subtotal' => $item['subtotal']
                     ];
                 });
+
+
+                $dataReservasi = [
+                    'tanggal_check_in' => $resev['tanggal_check_in']
+                ];
+    
+    
+                // dd($dataReservasi);
+    
+                // Mengambil data pesanan dan menggabungkannya dengan data reservasi
+                $pesanan = $resev->pesanan->map(function ($item) use ($dataReservasi) {
+                    // Pastikan $item dan $item['kamar'] ada dan valid
+                    // Ambil nomor kamar yang sudah dipesan
+                    $nomorKamarPemesanan = Reservasi::where('tanggal_check_in', $dataReservasi['tanggal_check_in'])
+                        ->where('status_reservasi', 'check_in')
+                        ->pluck('nomor_kamar_pemesanan')
+                        ->toArray();
+    
+                    // Uraikan setiap string menjadi array dan gabungkan semua nomor
+                    $combinedArray = [];
+                    foreach ($nomorKamarPemesanan as $i) {
+                        // Pastikan i adalah string yang valid sebelum di-decode
+                        $decodedi = json_decode($i, true); // Menggunakan true untuk mendapatkan array asosiatif
+                        if (is_array($decodedi)) {
+                            $combinedArray = array_merge($combinedArray, $decodedi);
+                        }
+                    }
+    
+                    // Hapus duplikat
+                    $combinedArray = array_unique($combinedArray);
+    
+                    // Ubah kembali array menjadi string JSON
+                    $res = array_values($combinedArray); // Menggunakan array_values untuk menjaga indeks numerik
+    
+                    // Jika Anda ingin hasilnya dalam format array dengan satu elemen
+                    $finalResult = json_encode($res); // Membuat array dengan satu elemen yang berisi string JSON
+    
+                    return [
+                        'id_reservasi' => $item['id_reservasi'],
+                        'id_pesanan' => $item['id'],
+                        'no_kamar' => $item['kamar']['no_kamar'], 
+                        'id_jenis_kamar' => $item['kamar']['id_jenis_kamar'],
+                        'jenisKamar' => $item['kamar']['jenisKamar']['tipe_kamar'] . ' - ' . $item['kamar']['jenisKamar']['jenis_ranjang'],
+                        'harga_kamar' => $item['harga_kamar'],
+                        'harga_akhir' => $item['harga_akhir'],
+                        'jumlah_malam' => $item['jumlah_malam'],
+                        'nomor_kamar_pemesanan' => $finalResult,
+                        'nomor_kamar' => $item['nomor_kamar'],
+                        'persentase_diskon' =>  isset($item['diskon']) ? $item['diskon']['persentase'] : 0,
+                        'persentase_kenaikan_harga' => isset($item['harga']) ? $item['harga']['persentase_kenaikan_harga'] : 0,
+                        'subtotal' => $item['subtotal']
+                    ];
+    
+    
+                });
+
+
                 
                 $this->pesanan = $pesanan;
                 
+                // dd($this->pesanan);
+                // dd($this->pesanan[]['nomor_kamar']);
     
     
                 $this->hargaDasarList = $pesanan->mapWithKeys(function ($item) {
@@ -264,8 +374,50 @@ class ReservasiIndex extends Component
                 $this->hargaAkhirList = $pesanan->mapWithKeys(function ($item) {
                     return [$item['no_kamar'] => floatval( $item['harga_akhir']) * $this->jumlahHari ]; // Akses no_kamar dan harga_akhir sebagai array key
                 });
+
+
+                $this->nomorKamar = $pesanan->mapWithKeys(function ($item) {
+
+
+                    // Decode JSON untuk mendapatkan array id_kamar
+                    $kamarIds = json_decode($item['nomor_kamar_pemesanan'], true);
+                    $kamarId1 = json_decode($item['nomor_kamar'], true);
+                
+                    // Ambil semua data kamar
+                    $kamar = Kamar::all(['id', 'no_kamar', 'status_no_kamar','status_pemesanan']);
+                
+                    // Modifikasi status_no_kamar menjadi true jika id kamar ada dalam id_kamar
+                    $kamarData = $kamar->map(function ($kamar) use ($kamarIds,$kamarId1) {
+                        // Jika id kamar ada dalam array id_kamar, ubah status_no_kamar menjadi true
+                        if (in_array($kamar->id, $kamarIds)) {
+                            $kamar->status_pemesanan = 1; // Ubah status_no_kamar menjadi true
+                        }
+
+                        if (in_array($kamar->id, $kamarId1)) {
+                            $kamar->status_no_kamar = 1; // Ubah status_no_kamar menjadi true
+                        }
+
+
+                        return $kamar;
+                    });
+                
+                    // Ambil hanya no_kamar dan status_no_kamar
+                    $result = $kamarData->map(function ($kamar) use ($item) {
+                        return [
+                            'id_pesanan' => $item['id_pesanan'], // Menyimpan id_pesanan
+                            'no_kamar' => $kamar->no_kamar,
+                            'status_no_kamar' => $kamar->status_no_kamar,
+                            'status_pemesanan' => $kamar->status_pemesanan
+                        ];
+                    });
+                
+                    // Menggunakan id_pesanan sebagai kunci
+                    return $result;
+                });
                 
                 // dd($hargaAkhirList,$hargaDasarList);
+
+                // dd($this->nomorKamar);
     
     
     
@@ -386,11 +538,32 @@ class ReservasiIndex extends Component
             
             $jumlahPembayaran = $this->converDescimal($this->IjumlahPembayaran);
             // dd($jumlahPembayaran);
-            $resev = Reservasi::find($this->id);
-            // dd($resev);
+            // dd($this->id);
+            $resev = Reservasi::where('id',$this->id)->with(
+                'pesn'
+            )->first();
 
             // dd($jumlahPembayaran);
+            // $pesanan = $resev->pesanan->first();
 
+            // dd($resev);
+            $kamarData = json_decode($resev->pesn->nomor_kamar, true);
+
+            $jumlahKamarDipesan = count($kamarData);
+            $jumlahKamarMax = $resev->jumlah_kamar;
+            // dd([
+            //     'datakamar' => $resev->pesn->nomor_kamar,
+            //     'totalISi' => $jumlahKamarDipesan,
+            //     'jumlahMAc' => $jumlahKamarMax,
+            //     'test' => $jumlahKamarDipesan != $jumlahKamarMax
+            // ]);
+
+
+            if ($jumlahKamarDipesan != $jumlahKamarMax) {
+                # code...
+                $this->dispatch('notify', title: 'fail', message: 'Jumlah Kamar Harus Sesuai dengan pesanan !');
+                return;
+            }
 
             if ($jumlahPembayaran == 0.00) {
                 $this->dispatch('notify', title: 'fail', message: 'Jumlah Pembayaran Tidak Boleh Nol!');
@@ -419,8 +592,21 @@ class ReservasiIndex extends Component
 
                     $res = Reservasi::find($this->id);
                     $res->update([
+                        'nomor_kamar_pemesanan' => $resev->pesn->nomor_kamar,
                         'status_reservasi' => 'check_in'
                     ]);
+
+
+                    // $pesan = Pesanan::find($resev->pesn->id);
+                    // $pesan->update(
+                    //     [
+                    //         'nomor_kamar' => json_encode([])
+                    //     ]
+                    //     );
+
+                    $this->nomorKamar = [];
+
+
 
                     is_null($res)
                     ? $this->dispatch('notify', title: 'fail', message: 'Check In dan Pembayaran gagal dilakukan')
@@ -474,18 +660,60 @@ class ReservasiIndex extends Component
                 // Mapping data pesanan ke array
                 $pesanan = $resev->pesanan->map(function ($item) {
                     return [
+                'id_pesanan' => $item['id'],
+
                         'no_kamar' => $item['kamar']['no_kamar'], 
+                        'id_jenis_kamar' => $item['kamar']['id_jenis_kamar'],
                         'jenisKamar' => $item['kamar']['jenisKamar']['tipe_kamar'] . ' - ' . $item['kamar']['jenisKamar']['jenis_ranjang'],
                         'harga_kamar' => $item['harga_kamar'],
                         'harga_akhir' => $item['harga_akhir'],
                         'jumlah_malam' => $item['jumlah_malam'],
+                        'nomor_kamar' => $item['nomor_kamar'],
                         'persentase_diskon' =>  isset($item['diskon']) ? $item['diskon']['persentase'] : 0,
                         'persentase_kenaikan_harga' => isset($item['harga']) ? $item['harga']['persentase_kenaikan_harga'] : 0,
                         'subtotal' => $item['subtotal']
                     ];
                 });
-                
-                $this->pesanan = $pesanan;
+
+
+                // dd($pesanan);
+
+
+            $this->pesanan = $pesanan;
+            
+            $this->nomorKamar = $pesanan->mapWithKeys(function ($item) {
+                // Decode JSON untuk mendapatkan array id_kamar
+                $kamarIds = json_decode($item['nomor_kamar'], true);
+            
+                // Pastikan $kamarIds adalah array dan tidak kosong
+                if (is_array($kamarIds) && !empty($kamarIds)) {
+                    // Ambil semua data kamar yang ID-nya ada dalam $kamarIds
+                    $kamar = Kamar::whereIn('id', $kamarIds)->get(['id', 'no_kamar', 'status_no_kamar']);
+                } else {
+                    // Jika tidak ada ID kamar, inisialisasi $kamar sebagai koleksi kosong
+                    $kamar = collect();
+                }
+            
+                // Ambil hanya no_kamar dan status_no_kamar dari setiap kamar
+                $result = $kamar->map(function ($k) use ($item) {
+                    return [
+                'id_pesanan' => $item['id_pesanan'], // Menyimpan id_pesanan
+
+                        'no_kamar' => $k->no_kamar,
+                        'status_no_kamar' => $k->status_no_kamar,
+                        'status_pemesanan' => $k->status_pemesanan
+
+                    ];
+                });
+            
+                // Menggunakan id_pesanan sebagai kunci
+                return $result; // Pastikan id_pesanan ada dalam $item
+            });
+            
+            // dd($hargaAkhirList,$hargaDasarList);
+
+            // dd($this->nomorKamar);
+
                 
     
     
@@ -525,6 +753,7 @@ class ReservasiIndex extends Component
 
             $res->update([
                 'status_reservasi' => 'check_out',
+                'nomor_kamar_pemesanan' => json_encode([]),
                 'denda' => $denda,
                 'keterangan' => $this->Iketerangan
             ]);
@@ -623,7 +852,7 @@ class ReservasiIndex extends Component
 
     public function submitSelesai(){
         // Menggunakan Query Builder untuk memperbarui status_reservasi tanpa mengubah updated_at
-        $selesai = DB::table('reservasis')->where('id', $this->id)->update([
+        $selesai = DB::table('reservasi')->where('id', $this->id)->update([
             'status_reservasi' => 'selesai',
             // Tidak menambahkan kolom updated_at di sini
         ]);

@@ -69,9 +69,9 @@
                 Batal
             </x-secondary-button>
 
-            <x-button @click="$wire.edit()" class="ms-3" wire:loading.attr="disabled">
+            <x-secondary-button @click="$wire.edit()" class="ms-3" wire:loading.attr="disabled">
                 Ubah
-            </x-button>
+            </x-secondary-button>
         </x-slot>
     </x-dialog-modal>
 </div>

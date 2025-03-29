@@ -22,10 +22,10 @@ class DatabaseSeeder extends Seeder
         Tamu::create([
             'nama' => "Andi",
             'no_tlpn' => "0989877779923",
-            'alamat' => 'no-data',
-            'email' => 'no-data', // 3 digit di email
-            'kota' => 'no-data',
-            'no_identitas' => 'no-data',
+            'alamat' => 'Sukarisk,sudamulih',
+            'email' => 'andi@gmail.com', // 3 digit di email
+            'kota' => 'Pangangandaran',
+            'no_identitas' => '98992399423',
         ]);
 
     

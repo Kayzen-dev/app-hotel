@@ -21,7 +21,7 @@
                             <label for="id_jenis_kamar" class="label text-white p-2 font-medium">Pilih Jenis Kamar</label>
                             <select id="id_jenis_kamar" x-model="selectedJenisKamar" @change="getKetersediaanKamar()" 
                                     class="select text-gray-300 select-bordered w-full border-gray-100 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" required>
-                                <option value="">-- Semua Jenis Kamar --</option>
+                                <option value="">-- Pilih Jenis Kamar --</option>
                                 <template x-for="jenis in jenisKamarList" :key="jenis.id">
                                     <option :value="jenis.id" x-text="`${jenis.tipe_kamar} - ${jenis.jenis_ranjang}`"></option>
                                 </template>
@@ -98,7 +98,7 @@
                 <label for="id_jenis_kamar" class="label text-white p-2 font-medium">Filter Jenis Kamar</label>
                 <select id="id_jenis_kamar" wire:model.live="idJenisKamar"
                         class="select text-gray-300 select-bordered w-full border-gray-100 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" required>
-                    <option value="">-- Pilih Jenis Kamar --</option>
+                    <option value="">-- Semua Jenis Kamar --</option>
                     <template x-for="jenis in jenisKamarList" :key="jenis.id">
                         <option :value="jenis.id" x-text="`${jenis.tipe_kamar} - ${jenis.jenis_ranjang}`"></option>
                     </template>
@@ -181,8 +181,8 @@
                         {{-- <td  class="text-center" >{{ $item->reservasi_count }}</td> --}}
                     
                         <td class="text-center">
-                            <x-button @click="$dispatch('dispatch-kamar-table-edit', { id: '{{ $item->id }}' })"
-                                type="button" class="text-sm">Edit Kamar</x-button>
+                            {{-- <x-button @click="$dispatch('dispatch-kamar-table-edit', { id: '{{ $item->id }}' })"
+                                type="button" class="text-sm">Edit Kamar</x-button> --}}
 
 
                                 <x-danger-button

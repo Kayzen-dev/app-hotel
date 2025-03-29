@@ -20,6 +20,7 @@ return new class extends Migration
             $table->integer('jumlah_kamar');
             $table->decimal('total_harga', 15, 2);
             $table->decimal('denda', 15, 2)->default(0);
+            $table->json('nomor_kamar_pemesanan');
             $table->enum('status_reservasi', ['dipesan', 'check_in', 'check_out', 'selesai','batal'])->default('dipesan');
             $table->text('keterangan')->nullable();
             $table->timestamps();
@@ -35,9 +36,13 @@ return new class extends Migration
             $table->decimal('harga_kamar', 15, 2);
             $table->decimal('harga_akhir', 15, 2);
             $table->integer('jumlah_malam');
+            $table->integer('jumlah_kamar')->nullable();
+            $table->json('nomor_kamar');
             $table->decimal('subtotal', 15, 2);
             $table->timestamps();
         });
+
+        
 
         Schema::create('pembayaran', function (Blueprint $table) {
             $table->id();
@@ -47,6 +52,16 @@ return new class extends Migration
             $table->decimal('kembalian', 15, 2)->default(0);
             $table->timestamps();
         });
+
+        // Schema::create('kamar_pesanan', function (Blueprint $table) {
+        //     $table->id();
+        //     $table->foreignId('id_pesanan')->constrained('pesanan')->onDelete('cascade');
+        //     $table->string('nomor_kamar'); 
+        //     $table->boolean('status_no_kamar')->default(false);
+        //     $table->timestamps();
+        // });
+
+
 
 
         // Schema::create('riwayat', function (Blueprint $table) {

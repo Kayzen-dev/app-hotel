@@ -108,7 +108,7 @@
     </div>
 
 
-            
+
     <x-dialog wire:model="showModalDetail" maxWidth="2xl">
         <x-slot name="title">
             <div class="flex items-center gap-3 px-6 pt-4">
@@ -175,7 +175,9 @@
                                         </svg>
                                         <span class="text-sm text-gray-600">Check-in</span>
                                     </div>
-                                    <span class="text-sm font-medium text-gray-900">{{ \Carbon\Carbon::parse($tanggal_check_in)->translatedFormat('d F Y'); }}</span>
+                                    <span class="text-sm font-medium text-gray-900">{{ \Carbon\Carbon::parse($tanggal_check_in)->translatedFormat('d F Y'); }} @if ($jamCheckIn)
+                                       , Jam : {{ $jamCheckIn }}
+                                    @endif</span>
                                 </div>
                                 
                                 <div class="flex justify-between items-center">
@@ -186,7 +188,11 @@
                                         </svg>
                                         <span class="text-sm text-gray-600">Check-out</span>
                                     </div>
-                                    <span class="text-sm font-medium text-gray-900">{{ \Carbon\Carbon::parse($tanggal_check_out)->translatedFormat('d F Y'); }}</span>
+                                    <span class="text-sm font-medium text-gray-900">{{ \Carbon\Carbon::parse($tanggal_check_out)->translatedFormat('d F Y'); }}
+                                     @if ($jamCheckOut)
+                                     , Jam : {{ $jamCheckOut }}
+                                    @endif
+                                    </span>
                                 </div>
 
                                 <div class="flex justify-between items-center">
@@ -227,8 +233,8 @@
                             <div class="flex flex-wrap gap-4 justify-center">
                                 @foreach ($pesanan as $item)
                                     <a class="bg-gray-100 flex-grow text-black border-l-8 border-green-500 rounded-md px-3 py-4 w-full md:w-5/12 lg:w-3/12">
-                                        <h3 class="text-lg font-medium text-gray-900">{{ $item['no_kamar'] }}</h3>
-                                        <p class="mt-1 text-sm text-gray-500">{{ $item['jenisKamar'] }}</p>
+                                        <h3 class="text-lg font-medium text-gray-900">{{ $item['jenisKamar'] }}</h3>
+                                        {{-- <p class="mt-1 text-sm text-gray-500">{{ $item['jenisKamar'] }}</p> --}}
                                         
                                         <div class="text-sm font-thin text-gray-500 pt-2">
                                             <p>Harga Kamar: 
@@ -278,6 +284,10 @@
                                     </a>
                                 @endforeach
                             </div>
+
+
+                            {{-- Nomor Kamar yang tersedia --}}
+
                         </div>
                         
 
@@ -287,7 +297,7 @@
                     <!-- Right Column - Payment Summary -->
                     <div class="space-y-4">
                         <div class="bg-white p-4 rounded-xl border border-gray-100">
-                            <h4 class="text-sm font-semibold text-gray-600 mb-3">Jumlah Pembayaran</h4>
+                            <h4 class="text-sm font-semibold text-gray-600 mb-3">Detail Harga</h4>
                             <div class="space-y-4">
                         
                                 <!-- Menampilkan Harga Awal -->
@@ -443,6 +453,7 @@
 
 
 
+
     <x-dialog wire:model="showModalInvoice" maxWidth="2xl">
         <x-slot name="title">
             <div class="flex items-center gap-3 px-6 pt-4">
@@ -522,39 +533,18 @@
                             <!-- Bagian Kiri: Informasi Kamar & Pembayaran -->
                             <div class="flex-1">
                                 <table class="w-full">
-                                    @if ($status_reservasi == "Check in")
-                                        <tr>
-                                            <th class="p-2 text-gray-600 text-sm font-normal w-1/2">Total Kamar:</th>
-                                            <td class="p-2 text-gray-900 font-semibold text-right">{{ $jumlahKamar }}</td>
-                                        </tr>
-                                        <tr>
-                                            <th class="p-2 text-gray-600 text-sm font-normal">Jumlah Pembayaran:</th>
-                                            <td class="p-2 text-gray-900 font-semibold text-right">Rp {{ number_format($jumlahPembayaran, 0, ',', '.') }}</td>
-                                        </tr>
-                                        <tr>
-                                            <th class="p-2 text-gray-600 text-sm font-normal">Kembalian:</th>
-                                            <td class="p-2 text-gray-900 font-semibold text-right">Rp {{ number_format($kembalian, 0, ',', '.') }}</td>
-                                        </tr>
-                                    @elseif ($status_reservasi == "Check out")
-                                        <tr>
-                                            <th class="p-2 text-gray-600 text-sm font-normal w-1/2">Total Kamar:</th>
-                                            <td class="p-2 text-gray-900 font-semibold text-right">{{ $jumlahKamar}}</td>
-                                        </tr>
-                                        <tr>
-                                            <th class="p-2 text-gray-600 text-sm font-normal">Jumlah Pembayaran:</th>
-                                            <td class="p-2 text-gray-900 font-semibold text-right">Rp {{ number_format($jumlahPembayaran, 0, ',', '.') }}</td>
-                                        </tr>
-                                        <tr>
-                                            <th class="p-2 text-gray-600 text-sm font-normal">Kembalian:</th>
-                                            <td class="p-2 text-gray-900 font-semibold text-right">Rp {{ number_format($kembalian, 0, ',', '.') }}</td>
-                                        </tr>
-                                    @else
-                                        <tr>
-                                            <th class="p-2 text-gray-600 text-sm font-normal w-1/2">Total Kamar:</th>
-                                            <td class="p-2 text-gray-900 font-semibold text-right">{{ $jumlahKamar}}</td>
-                                        </tr>
-                                        
-                                    @endif
+                                    <tr>
+                                        <th class="p-2 text-gray-600 text-sm font-normal w-1/2">Total Kamar:</th>
+                                        <td class="p-2 text-gray-900 font-semibold text-right">{{ $jumlahKamar}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th class="p-2 text-gray-600 text-sm font-normal">Jumlah Pembayaran:</th>
+                                        <td class="p-2 text-gray-900 font-semibold text-right">Rp {{ number_format($jumlahPembayaran, 0, ',', '.') }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th class="p-2 text-gray-600 text-sm font-normal">Kembalian:</th>
+                                        <td class="p-2 text-gray-900 font-semibold text-right">Rp {{ number_format($kembalian, 0, ',', '.') }}</td>
+                                    </tr>
                                 </table>
                             </div>
                         
@@ -564,26 +554,14 @@
                             <!-- Bagian Kanan: Total & Denda -->
                             <div class="flex-1">
                                 <table class="w-full">
-                                    @if ($status_reservasi == "Check in")
-                                        <tr class="border-t border-gray-200">
-                                            <th class="p-2 text-gray-900 font-bold pt-3">Total:</th>
-                                            <td class="p-2 text-red-600 font-bold text-right pt-3">Rp {{ number_format($total_harga, 0, ',', '.') }}</td>
-                                        </tr>
-                                    @elseif ($status_reservasi == "Check out")
-                                        <tr>
-                                            <th class="p-2 text-gray-900 font-bold pt-3">Total:</th>
-                                            <td class="p-2 text-red-600 font-bold text-right pt-3">Rp {{ number_format($total_harga, 0, ',', '.') }}</td>
-                                        </tr>
-                                        <tr class="border-t border-gray-200">
-                                            <th class="p-2 text-gray-600 text-sm font-normal">Denda:</th>
-                                            <td class="p-2 text-gray-900 font-semibold text-right">Rp {{ number_format($denda, 0, ',', '.') }}</td>
-                                        </tr>
-                                    @else
-                                        <tr class="border-t border-gray-200">
-                                            <th class="p-2 text-gray-900 font-bold pt-3">Total:</th>
-                                            <td class="p-2 text-red-600 font-bold text-right pt-3">Rp {{ number_format($total_harga, 0, ',', '.') }}</td>
-                                        </tr>
-                                    @endif
+                                    <tr>
+                                        <th class="p-2 text-gray-900 font-bold pt-3">Total:</th>
+                                        <td class="p-2 text-red-600 font-bold text-right pt-3">Rp {{ number_format($total_harga, 0, ',', '.') }}</td>
+                                    </tr>
+                                    <tr class="border-t border-gray-200">
+                                        <th class="p-2 text-gray-600 text-sm font-normal">Denda:</th>
+                                        <td class="p-2 text-gray-900 font-semibold text-right">Rp {{ number_format($denda, 0, ',', '.') }}</td>
+                                    </tr>
                                 </table>
                             </div>
                         </div>

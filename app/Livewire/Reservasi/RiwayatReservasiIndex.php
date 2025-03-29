@@ -197,6 +197,9 @@ class RiwayatReservasiIndex extends Component
 
 
 
+
+
+    
     public function INVOICE($id) 
     {
         Carbon::setLocale('id');
@@ -244,21 +247,13 @@ class RiwayatReservasiIndex extends Component
                 $this->status_reservasi = $resev->status_reservasi;
             }
 
-            if ($resev->status_reservasi == 'check_in') {
-
-                $this->jumlahPembayaran = $resev->pembayaran->jumlah_pembayaran;
-                $this->kembalian = $resev->pembayaran->kembalian;
-                $this->user = $resev->pembayaran->user->username;
-
-            }elseif ($resev->status_reservasi == 'check_out') {
-                    $this->jumlahPembayaran = $resev->pembayaran->jumlah_pembayaran;
-                    $this->kembalian = $resev->pembayaran->kembalian;
-                    $this->user = $resev->pembayaran->user->username;
-                    $this->denda = $resev->denda;
-            }
 
 
-            
+
+            $this->jumlahPembayaran = $resev->pembayaran->jumlah_pembayaran;
+            $this->kembalian = $resev->pembayaran->kembalian;
+            $this->user = $resev->pembayaran->user->username;
+            $this->denda = $resev->denda;            
 
             $this->keterangan = $resev->keterangan;
             $this->jumlahHari = \Carbon\Carbon::parse($resev->tanggal_check_in)->diffInDays($resev->tanggal_check_out);
@@ -286,6 +281,7 @@ class RiwayatReservasiIndex extends Component
         $this->showModalInvoice = true;
 
     }
+
     
     public function cetakInvoice() {
         return Redirect()->route('resep.invoice',['idRes' => $this->id]);

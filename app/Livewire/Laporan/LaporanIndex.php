@@ -5,8 +5,6 @@ namespace App\Livewire\Laporan;
 use Carbon\Carbon;
 use Livewire\Component;
 use App\Models\Reservasi;
-use App\Models\Pesanan;
-use App\Models\Kamar;
 use Livewire\WithPagination;
 use Illuminate\Support\Facades\DB;
 
@@ -17,13 +15,8 @@ class LaporanIndex extends Component
     public $tanggalMulai;
     public $tanggalSelesai;
     public $totalPendapatan = 0;
-    public $pendapatanKamar = 0;
-    public $totalDiskon = 0;
     public $totalReservasi = 0;
     public $pendapatanPerJenisKamar = [];
-    public $revPar = 0;
-    public $adr = 0;
-    public $occupancyRate = 0;
 
     protected $rules = [
         'tanggalMulai' => 'required|date',
@@ -34,90 +27,80 @@ class LaporanIndex extends Component
     {
         $this->tanggalMulai = Carbon::now()->startOfMonth()->toDateString();
         $this->tanggalSelesai = Carbon::now()->endOfMonth()->toDateString();
-        $this->totalReservasi = Reservasi::where(function ($query) {
-            // Memeriksa jika tanggal_check_in dalam rentang bulan ini dan status bukan "batal"
-            $query->whereBetween('tanggal_check_in', [$this->tanggalMulai, $this->tanggalSelesai])
-                  ->where('status_reservasi', '!=', 'batal') // status bukan "batal"
-                  
-                  // Kondisi OR: Jika tanggal_check_out dalam rentang bulan ini
-                  ->orWhereBetween('tanggal_check_out', [$this->tanggalMulai, $this->tanggalSelesai])
-                  
-                  // Kondisi OR lainnya: jika reservasi mencakup sebagian dari bulan ini (tanggal_check_in sebelum akhir bulan dan tanggal_check_out setelah awal bulan)
-                  ->orWhere(function ($query) {
-                      $query->where('tanggal_check_in', '<=', $this->tanggalSelesai)
-                            ->where('tanggal_check_out', '>=', $this->tanggalMulai);
-                  });
-        })->count();
-        $this->hitungTotalPendapatan();
+        $this->updateData();
     }
 
     public function updated()
     {
-        $this->hitungTotalPendapatan();
+        $this->validate();
+        $this->updateData();
     }
 
-    public function hitungTotalPendapatan()
+    private function updateData()
     {
-        $this->validate();
-        
-        // Hitung total pendapatan kamar
-        $this->pendapatanKamar = Pesanan::whereHas('reservasi', function($query) {
-            $query->whereBetween('tanggal_check_out', [$this->tanggalMulai, $this->tanggalSelesai])
-                  ->where('status_reservasi', 'selesai');
-        })->sum('subtotal');
+        // Hitung semua total reservasi 
+        // $this->totalReservasi = Reservasi::where('status_reservasi', '!=', 'batal')
+        //     ->where(function ($query) {
+        //         $this->applyDateFilter($query);
+        //     })
+        //     ->count();
 
-        // Hitung total diskon
-        $this->totalDiskon = Pesanan::whereHas('reservasi', function($query) {
-            $query->whereBetween('tanggal_check_out', [$this->tanggalMulai, $this->tanggalSelesai])
-                  ->where('status_reservasi', 'selesai');
-        })->sum(DB::raw('(harga_kamar * jumlah_malam) - harga_akhir'));
+// hitung reservasi selesai
+            $this->totalReservasi = Reservasi::where('status_reservasi','selesai')
+            ->where(function ($query) {
+                $this->applyDateFilter($query);
+            })
+            ->count();
 
-        // Hitung pendapatan per jenis kamar
-        $this->pendapatanPerJenisKamar = Pesanan::select(
+        // Hitung total pendapatan
+        $this->totalPendapatan = Reservasi::where('status_reservasi', 'selesai')
+            ->where(function ($query) {
+                $this->applyDateFilter($query);
+            })
+            ->sum('total_harga');
+
+            $this->pendapatanPerJenisKamar = Reservasi::select(
                 'jenis_kamar.tipe_kamar',
-                DB::raw('SUM(pesanan.subtotal) as total')
+                DB::raw('SUM(reservasi.jumlah_kamar * pesanan.harga_akhir * pesanan.jumlah_malam) as total')
             )
+            ->join('pesanan', 'reservasi.id', '=', 'pesanan.id_reservasi')
             ->join('kamar', 'pesanan.id_kamar', '=', 'kamar.id')
             ->join('jenis_kamar', 'kamar.id_jenis_kamar', '=', 'jenis_kamar.id')
-            ->whereHas('reservasi', function($query) {
-                $query->whereBetween('tanggal_check_out', [$this->tanggalMulai, $this->tanggalSelesai])
-                      ->where('status_reservasi', 'selesai');
+            ->where('status_reservasi', 'selesai')
+            ->where(function ($query) {
+                $this->applyDateFilter($query);
             })
             ->groupBy('jenis_kamar.tipe_kamar')
             ->get();
+    }
 
-        // Hitung metrik kinerja
-        $start = Carbon::parse($this->tanggalMulai);
-        $end = Carbon::parse($this->tanggalSelesai);
-        $days = $start->diffInDays($end) + 1;
-        $totalKamar = Kamar::count();
-        $totalKamarTerjual = Reservasi::whereBetween('tanggal_check_out', [$this->tanggalMulai, $this->tanggalSelesai])
-            ->where('status_reservasi', 'selesai')
-            ->sum('jumlah_kamar');
-
-        // RevPAR
-        $this->revPar = $totalKamar > 0 ? $this->pendapatanKamar / ($totalKamar * $days) : 0;
-        
-        // ADR
-        $this->adr = $totalKamarTerjual > 0 ? $this->pendapatanKamar / $totalKamarTerjual : 0;
-        
-        // Occupancy Rate
-        $this->occupancyRate = ($totalKamar * $days) > 0 
-            ? ($totalKamarTerjual / ($totalKamar * $days)) * 100 
-            : 0;
-
-        $this->totalPendapatan = $this->pendapatanKamar;
-
-
+    private function applyDateFilter($query)
+    {
+        $query->where(function ($q) {
+            $q->whereBetween('tanggal_check_in', [$this->tanggalMulai, $this->tanggalSelesai])
+                ->orWhereBetween('tanggal_check_out', [$this->tanggalMulai, $this->tanggalSelesai])
+                ->orWhere(function ($sub) {
+                    $sub->where('tanggal_check_in', '<', $this->tanggalMulai)
+                        ->where('tanggal_check_out', '>', $this->tanggalSelesai);
+                });
+        });
     }
 
     public function render()
     {
-        $data = Reservasi::whereBetween('tanggal_check_out', [$this->tanggalMulai, $this->tanggalSelesai])
+        $data = Reservasi::with('tamu','pesanan.kamar.jenisKamar')
             ->where('status_reservasi', 'selesai')
+            ->where(function ($query) {
+                $this->applyDateFilter($query);
+            })
             ->orderBy('tanggal_check_out', 'desc')
             ->paginate(10);
 
-        return view('livewire.laporan.laporan-index', compact('data'));
+        return view('livewire.laporan.laporan-index', [
+            'data' => $data,
+            'pendapatanPerJenisKamar' => $this->pendapatanPerJenisKamar,
+            'totalReservasi' => $this->totalReservasi,
+            'totalPendapatan' => $this->totalPendapatan
+        ]);
     }
 }

@@ -36,7 +36,7 @@
                         Aplikasi Manajemen Hotel ini dirancang untuk memudahkan pengelolaan operasional hotel, 
                         mulai dari proses reservasi, pencatatan data tamu, hingga pembuatan laporan keuangan. 
                         Dengan sistem ini, staf hotel dapat dengan mudah mengakses informasi terkait kamar yang tersedia, 
-                        memproses pembayaran, dan mengelola riwayat tamu dalam satu platform yang terintegrasi
+                        memproses pembayaran, dan mengelola riwayat tamu.
                     </p>
         
                 </div>

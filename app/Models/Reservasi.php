@@ -35,6 +35,10 @@ class Reservasi extends Model
         return $this->hasMany(Pesanan::class, 'id_reservasi');
     }
 
+    public function pesn() {
+        return $this->hasOne(Pesanan::class, 'id_reservasi');
+    }
+
 
 
     public function pembayaran()
