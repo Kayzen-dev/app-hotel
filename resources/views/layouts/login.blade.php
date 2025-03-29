@@ -8,7 +8,6 @@
 
     <title>Aplikasi Manajemen Hotel</title>
 
-
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
@@ -17,57 +16,66 @@
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
+    <style>
+        /* Tambahkan CSS untuk memastikan elemen memenuhi layar */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        .full-screen {
+            display: flex;
+            flex-direction: column;
+            height: 100vh; /* Mengatur tinggi penuh layar */
+        }
+
+        .content {
+            flex: 1; /* Membuat konten mengisi ruang yang tersedia */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px; /* Tambahkan padding untuk ruang */
+        }
+
+        footer {
+            padding: 20px;
+            text-align: center;
+        }
+    </style>
 </head>
 
+<body class="bg-white dark:bg-gray-900 full-screen">
 
-<body class="bg-white dark:bg-gray-900">
-    <section class="bg-white dark:bg-gray-900">
+    <section class="content">
+        <div class="overflow-hidden lg:mx-8 lg:flex lg:max-w-6xl lg:w-full lg:rounded-xl mt-20">
+            <div class="max-w-xl px-6 py-12 lg:max-w-5xl lg:w-1/2">
+                <h2 class="text-2xl font-semibold text-gray-800 dark:text-white md:text-3xl">
+                    Aplikasi Manajemen <span class="text-blue-500">Hotel</span>
+                </h2>
 
-        <section class="lg:py-15 lg:flex lg:justify-center">
-            <div
-                class="overflow-hidden lg:mx-8 lg:flex lg:max-w-6xl lg:w-full  lg:rounded-xl mt-20">
-                
-                <div class="max-w-xl px-6 py-12 lg:max-w-5xl lg:w-1/2">
-                    <h2 class="text-2xl font-semibold text-gray-800 dark:text-white md:text-3xl">
-                        Aplikasi Manajemen <span class="text-blue-500">Hotel</span>
-                    </h2>
-        
-                    <p class="mt-4 text-gray-500 dark:text-gray-300">
-                        Aplikasi Manajemen Hotel ini dirancang untuk memudahkan pengelolaan operasional hotel, 
-                        mulai dari proses reservasi, pencatatan data tamu, hingga pembuatan laporan keuangan. 
-                        Dengan sistem ini, staf hotel dapat dengan mudah mengakses informasi terkait kamar yang tersedia, 
-                        memproses pembayaran, dan mengelola riwayat tamu.
-                    </p>
-        
-                </div>
-
-                <div class="lg:w-1/2">
-                         {{ $slot }}
-                </div>
-        
+                <p class="mt-4 text-gray-500 dark:text-gray-300">
+                    Aplikasi Manajemen Hotel ini dirancang untuk memudahkan pengelolaan operasional hotel, 
+                    mulai dari proses reservasi, pencatatan data tamu, hingga pembuatan laporan keuangan. 
+                    Dengan sistem ini, staf hotel dapat dengan mudah mengakses informasi terkait kamar yang tersedia, 
+                    memproses pembayaran, dan mengelola riwayat tamu.
+                </p>
             </div>
-        </section>
 
-
-
+            <div class="lg:w-1/2">
+                {{ $slot }}
+            </div>
+        </div>
     </section>
 
     <footer class="bg-white dark:bg-gray-900">
         <div class="container px-6 py-8 mx-auto">
-    
             <hr class="my-6 border-gray-200 md:my-10 dark:border-gray-700" />
-    
             <div class="flex flex-col items-center sm:flex-row sm:justify-between">
-                <p class="text-sm text-gray-500 dark:text-gray-300">Crown Hotel Pangandaran Syariah | JL Kidang Pananjung No.88 Pangandaran, Jawa Barat</p>
+                <p class="text-sm text-gray-500 dark:text-gray-300">Crown Hotel Pangandaran Syariah | Jalan Kidang Pananjung No.88 Pangandaran, Jawa Barat</p>
             </div>
         </div>
     </footer>
 
-
-
-
-
 </body>
-
-
 </html>
