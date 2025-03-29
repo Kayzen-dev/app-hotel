@@ -1,15 +1,11 @@
 <div>
 
 <div class="py-6">
-    {{-- <h2 class="text-xl font-semibold leading-tight text-gray-800">
-        Dashboard Resepsioniss - {{ now()->translatedFormat('l, d F Y') }}
-    </h2>
- --}}
-    <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-            <h2 class="text-3xl m-4 font-semibold text-gray-100">
-        Dashboard Resepsioniss - {{ now()->translatedFormat('l, d F Y') }}
-    </h2>
 
+       <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
+            <h2 class="text-3xl m-4 font-semibold text-gray-100">
+                @role('resepsionis') Dashboard Resepsionis - {{ now()->translatedFormat('l, d F Y') }} @endrole
+    </h2>
         <!-- Grid Statistik -->
         <div class="grid grid-cols-1 gap-6 mb-8 md:grid-cols-2 lg:grid-cols-4">
             <!-- Kamar Tersedia -->
