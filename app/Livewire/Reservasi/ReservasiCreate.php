@@ -2,11 +2,12 @@
 
 namespace App\Livewire\Reservasi;
 
+use App\Models\Tamu;
 use App\Models\Kamar;
 use App\Models\Pesanan;
-use App\Models\Tamu;
 use Livewire\Component;
 use App\Models\Reservasi;
+use Illuminate\Support\Facades\DB;
 
 
 class ReservasiCreate extends Component
@@ -137,6 +138,28 @@ class ReservasiCreate extends Component
 
         // dd(is_null($this->idTamu));
 
+
+
+        // $nomor_kamar = DB::table('kamar')
+        //         ->where('id_jenis_kamar', 1)  // Filter berdasarkan id_jenis_kamar
+        //         ->where('status_kamar', 'tersedia')  // Status kamar harus tersedia
+        //         ->select('no_kamar')  // Ambil hanya kolom no_kamar
+        //         ->get()
+        //         ->map(function ($item) {
+        //             return [
+        //                 'no_kamar' => $item->no_kamar,
+        //                 'status_no_kamar' => true  // Set status_no_kamar menjadi true
+        //             ];
+        //         });
+                
+        // // $no_json = json_encode([
+        // //     'nomor_kamar' => $nomor_kamar
+        // // ], JSON_PRETTY_PRINT);
+
+
+        // dd($no_json);
+
+
    
         if (is_null($this->idTamu)) {
             $tamu = Tamu::create([
@@ -149,42 +172,74 @@ class ReservasiCreate extends Component
             ]);
         }
 
-        $kamar = Kamar::where('id_jenis_kamar', $this->id_jenis_kamar)->first();
+        // $idKamar = Kamar::where('id_jenis_kamar', $this->id_jenis_kamar)
+        // ->limit($this->jumlahKamar)
+        // ->pluck('id')->toArray();
 
-
-        $reservasi = Reservasi::create([
-            'no_reservasi' => $this->buatNoReservasi(),
-            'id_tamu' => $tamu->id ?? $this->idTamu,
-            'tanggal_check_in' => $this->tanggal_check_in,
-            'tanggal_check_out' => $this->tanggal_check_out,
-            'jumlah_kamar' => $this->jumlahKamar,
-            'total_harga' => $totalHarga,
-            'status_reservasi' => 'dipesan',
-        ]);
+        $idKamar = [];
+        // dd($idKamar);
 
 
 
+            // Membuat reservasi baru
+            $reservasi = Reservasi::create([
+                'no_reservasi' => $this->buatNoReservasi(),
+                'id_tamu' => $tamu->id ?? $this->idTamu,
+                'tanggal_check_in' => $this->tanggal_check_in,
+                'tanggal_check_out' => $this->tanggal_check_out,
+                'jumlah_kamar' => $this->jumlahKamar,
+                'total_harga' => $totalHarga,
+                'nomor_kamar_pemesanan' => json_encode($idKamar),
+                'status_reservasi' => 'dipesan',
+            ]);
 
-        Pesanan::create([
-            'id_reservasi' => $reservasi->id,
-            'id_kamar' => $kamar->id, 
-            'id_diskon' => $this->id_diskon ?? null,
-            'id_harga' => $this->id_harga ?? null,
-            'harga_kamar' => $kamar->harga_kamar,
-            'harga_akhir' => floatval($hargaPerMalam),
-            'jumlah_malam' => $this->jumlahHari,
-            'subtotal' => floatval($hargaPerMalam) * $this->jumlahHari
-        ]);
+            // Mengambil semua kamar berdasarkan id_jenis_kamar
+            $semuaKamar = Kamar::where('id_jenis_kamar', $this->id_jenis_kamar)->get();
 
-        // $reservasi->update([
-        //     'total_harga' => Pesanan::where('id_reservasi', $reservasi->id)->sum('subtotal')
-        // ]);
+            // Mengambil kamar yang sudah dimiliki oleh pesanan
+            $kamarDimiliki = Kamar::where('id_jenis_kamar', $this->id_jenis_kamar)
+                                    ->whereHas('pesanan') // Memastikan kamar memiliki pesanan
+                                    ->get();
 
-        $simpan = $reservasi;
+            // Menggabungkan hasil
+            $kamar = $semuaKamar->map(function ($kamarItem) use ($kamarDimiliki) {
+                // Menambahkan status apakah kamar dimiliki atau tidak
+                $kamarItem->dimiliki = $kamarDimiliki->contains('id', $kamarItem->id);
+                return $kamarItem;
+            });
+
+            // Mengambil kamar pertama yang tersedia
+            $kam = $kamar->first();
+
+            // dd($kam);
+            // Memeriksa apakah ada kamar yang tersedia
+            if ($kam) {
+                // Membuat pesanan baru
+               Pesanan::create([
+                    'id_reservasi' => $reservasi->id,
+                    'id_kamar' => $kam->id, // Pastikan menggunakan 'id' yang benar
+                    'id_diskon' => $this->id_diskon ?? null,
+                    'id_harga' => $this->id_harga ?? null,
+                    'harga_kamar' => $kam->harga_kamar,
+                    'harga_akhir' => floatval($hargaPerMalam),
+                    'jumlah_malam' => $this->jumlahHari,
+                    'jumlah_kamar' => $this->jumlahKamar,
+                    'nomor_kamar' => json_encode($idKamar),
+                    'subtotal' => floatval($hargaPerMalam) * $this->jumlahHari
+                ]);
+
+                      // Menyimpan objek reservasi ke variabel $simpan
+            $simpan = $reservasi;
+            } else {
+                // Menangani situasi ketika tidak ada kamar yang tersedia
+                $simpan = null;
+            }
+
+      
 
         // dd($simpan);
         is_null($simpan)
-            ? $this->dispatch('notify', title: 'fail', message: 'Data gagal disimpan')
+            ? $this->dispatch('notify', title: 'fail', message: 'Data gagal disimpan terjadi kesalahan')
             : $this->dispatch('notify', title: 'success', message: 'Data berhasil disimpan');
     
         $this->resetForm();

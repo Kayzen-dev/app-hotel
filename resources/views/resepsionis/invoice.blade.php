@@ -12,6 +12,7 @@
         }
     </style>
     <script>
+        
         window.onload = function() {
             setTimeout(() => {
                 window.print();
@@ -37,6 +38,7 @@
 </head>
 <body class="bg-gray-100 p-4 min-h-screen flex justify-center items-start">
     <div class="max-w-3xl bg-white p-6 rounded-lg">
+
         <div class="flex items-center justify-between mb-8">
             <div class="flex items-center">
                 <img class="h-20 w-20 mr-2" src="{{ asset('images/logo_hotel.png') }}" alt="Logo" />
@@ -68,6 +70,7 @@
                 </p>
             </div>
         </div>
+
     
         <table class="w-full border-collapse">
             <thead>
@@ -92,6 +95,7 @@
             </tbody>
         </table>
         
+
         <div class="flex justify-between mt-6 gap-8">
             <!-- Bagian Kiri: Informasi Kamar & Pembayaran -->
             <div class="flex-1">
@@ -162,7 +166,33 @@
                 </table>
             </div>
         </div>
+
+        
+
+        <div class="mt-8 pt-4 border-t-2 border-gray-200">
+            <div class="flex justify-end items-center">
+                <div class="text-sm text-gray-700">
+                    Manager Hotel<br>
+                    <br><br><br>
+                    {{ Auth::user()->name }}
+                </div>
+            </div>
+        </div>
+
+                  <!-- Footer -->
+                  <div class="mt-8 pt-4 border-t-2 border-gray-200">
+                    <div class="flex justify-between items-center">
+                        <div class="text-sm text-gray-500">
+                            Dicetak pada: {{ now()->isoFormat('D MMMM Y HH:mm:ss') }}
+                        </div>
+                     
+                    </div>
+                </div>
     
     </div>
+
+ 
+
+
 </body>
 </html>

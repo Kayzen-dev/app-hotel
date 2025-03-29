@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Models;
-use App\Models\Reservasi;
 use Illuminate\Database\Eloquent\Model;
 
 class Kamar extends Model
@@ -21,10 +20,12 @@ class Kamar extends Model
         return $this->belongsTo(JenisKamar::class, 'id_jenis_kamar');
     }
 
-    // public function reservasi()
-    // {
-    //     return $this->hasMany(Reservasi::class, 'id_kamar');
-    // }
+
+    public function nomorKamar()
+    {
+        return $this->hasOne(nomorKamar::class, 'id_kamar');
+    }
+
 
 
     public function pesanan() {

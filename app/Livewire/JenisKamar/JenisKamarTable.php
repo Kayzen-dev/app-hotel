@@ -30,7 +30,6 @@ class JenisKamarTable extends Component
         [
             'data' => JenisKamar::where('id', 'like', '%' . $this->form->id . '%')
                 ->with('diskon','harga')
-                ->withCount('kamar')
                 ->where('tipe_kamar', 'like', '%' . $this->form->tipe_kamar . '%')
                 ->where('jenis_ranjang', 'like', '%' . $this->form->jenis_ranjang . '%')
                 ->orderBy($this->sortBy, $this->sortDirection)

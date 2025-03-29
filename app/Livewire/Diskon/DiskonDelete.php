@@ -34,7 +34,7 @@ class DiskonDelete extends Component
         $diskon = Pesanan::where('id_diskon', $this->id)->get();
 
         if ($diskon->isNotEmpty()) {
-            $this->dispatch('notify', title: 'fail', message: 'Data gagal dihapus, harga sedang digunakan');
+            $this->dispatch('notify', title: 'fail', message: 'Data gagal dihapus, diskon sedang digunakan');
             $this->modalDiskonDelete = false;
             return;
         }

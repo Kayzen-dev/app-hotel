@@ -5,7 +5,9 @@ namespace App\Livewire\Forms;
 use Livewire\Form;
 use App\Models\Kamar;
 use App\Models\JenisKamar;
+use App\Models\nomorKamar;
 use Livewire\Attributes\Validate;
+use Illuminate\Support\Facades\DB;
 
 class JenisKamarForm extends Form
 {
@@ -57,7 +59,8 @@ class JenisKamarForm extends Form
             // Simpan Jenis Kamar terlebih dahulu
             $jenisKamar = JenisKamar::create([
                 'tipe_kamar' => $this->tipe_kamar,
-                'jenis_ranjang' => $this->jenis_ranjang
+                'jenis_ranjang' => $this->jenis_ranjang,
+                'total_kamar' => $this->jumlahKamar
             ]);
             
             $hargaKamar = $this->hargaKamar;
@@ -78,6 +81,41 @@ class JenisKamarForm extends Form
                     'harga_kamar'=> $hargaKamar
                 ]);
             }
+
+
+            // $nomor_kamar = DB::table('kamar')
+            // ->where('id_jenis_kamar',  $jenisKamar->id)
+            // ->where('status_kamar', 'tersedia')
+            // ->select('no_kamar')
+            // ->get()
+            // ->map(function ($item) {
+            //     return [
+            //         'no_kamar' => $item->no_kamar,
+            //         'status_no_kamar' => true // Set status_no_kamar menjadi true secara default
+            //     ];
+            // });
+    
+        // return response()->json([
+        //     'nomor_kamar' => $nomor_kamar
+        // ], 200, [], JSON_PRETTY_PRINT);
+
+        // $no_json = json_encode([
+        //             'nomor_kamar' => $nomor_kamar
+        //         ], JSON_PRETTY_PRINT);
+
+
+        //         dd($no_json);
+
+            // $kamar = DB::table('kamar')->where('id_jenis_kamar', $jenisKamar->id)->first();
+
+
+            // nomorKamar::create(
+            //         [
+            //             'id_kamar' => $kamar->id,
+            //             'nomor_kamar' => $nomor_kamar
+            //         ]
+            //     );
+
 
             return $jenisKamar;
         }

@@ -6,6 +6,9 @@
     </h2>
  --}}
     <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
+            <h2 class="text-3xl m-4 font-semibold text-gray-100">
+        Dashboard Resepsioniss - {{ now()->translatedFormat('l, d F Y') }}
+    </h2>
 
         <!-- Grid Statistik -->
         <div class="grid grid-cols-1 gap-6 mb-8 md:grid-cols-2 lg:grid-cols-4">
@@ -35,7 +38,7 @@
             <div class="p-6 bg-white rounded-lg shadow-sm">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-sm font-medium text-gray-500">Tamu Check-in</p>
+                        <p class="text-sm font-medium text-gray-500">Tamu Akan Check-in</p>
                         <p class="mt-2 text-3xl font-semibold text-purple-600">{{ $tamuCheckIn }}</p>
                     </div>
                     <x-icons.users class="w-12 h-12 text-purple-100" />
@@ -47,7 +50,7 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-500">Pendapatan Hari Ini</p>
-                        <p class="mt-2 text-3xl font-semibold text-rose-600">Rp {{ number_format($totalPendapatanHariIni, 0, ',', '.') }}</p>
+                        <p class="mt-2 text-2xl font-semibold text-rose-600">Rp {{ number_format($totalPendapatanHariIni, 0, ',', '.') }}</p>
                     </div>
                     <x-icons.cash class="w-12 h-12 text-rose-100" />
                 </div>
@@ -60,7 +63,7 @@
             <div class="lg:col-span-2">
                 <div class="bg-white rounded-lg shadow-sm">
                     <div class="px-6 py-4 border-b border-gray-200">
-                        <h3 class="text-lg font-semibold">Reservasi Terbaru</h3>
+                        <h3 class="text-lg font-semibold text-gray-800">Reservasi Hari ini</h3>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="min-w-full">
@@ -68,15 +71,22 @@
                                 <tr>
                                     <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500">No. Reservasi</th>
                                     <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500">Nama Tamu</th>
+                                    <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500">No Kamar</th>
                                     <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500">Check-in</th>
                                     <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500">Status</th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
+                                {{-- @dd($reservasiTerbaru) --}}
                                 @foreach($reservasiTerbaru as $reservasi)
                                 <tr class="hover:bg-gray-50">
                                     <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ $reservasi->no_reservasi }}</td>
                                     <td class="px-6 py-4 text-sm text-gray-500">{{ $reservasi->tamu->nama }}</td>
+                                    <td class="px-6 py-4 text-sm text-gray-500">
+                                        @foreach($reservasi->pesanan as $pesanan)
+                                        {{ $pesanan->kamar->jenisKamar->tipe_kamar }} - {{ $pesanan->kamar->jenisKamar->jenis_ranjang }}<br>
+                                    @endforeach
+                                    </td>
                                     <td class="px-6 py-4 text-sm text-gray-500">
                                         {{ \Carbon\Carbon::parse($reservasi->tanggal_check_in)->translatedFormat('d M Y') }}
                                     </td>
@@ -100,7 +110,7 @@
             <!-- Aktivitas Terkini -->
             <div class="bg-white rounded-lg shadow-sm">
                 <div class="px-6 py-4 border-b border-gray-200">
-                    <h3 class="text-lg font-semibold">Aktivitas Terkini</h3>
+                    <h3 class="text-lg font-semibold text-gray-800">Aktivitas Terkini</h3>
                 </div>
                 <div class="p-4 space-y-4">
                     <!-- Kamar dalam Perbaikan -->
@@ -131,13 +141,13 @@
                     </div>
 
                     <!-- Tingkat Okupansi -->
-                    <div class="flex items-start p-3 bg-blue-50 rounded-lg">
+                    {{-- <div class="flex items-start p-3 bg-blue-50 rounded-lg">
                         <x-icons.chart-bar class="flex-shrink-0 w-5 h-5 mt-1 text-blue-600" />
                         <div class="ml-3">
                             <p class="text-sm font-medium text-blue-800">{{ $occupancyRate }}%</p>
                             <p class="text-xs text-blue-700">Tingkat okupansi kamar hari ini</p>
                         </div>
-                    </div>
+                    </div> --}}
                 </div>
             </div>
         </div>

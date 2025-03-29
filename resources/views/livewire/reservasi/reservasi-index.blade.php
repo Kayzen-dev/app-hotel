@@ -23,7 +23,7 @@
                 <th class="text-sm cursor-pointer text-center">
                     Status Reservasi
                 </th>
-                
+
                 <th class="text-sm cursor-pointer text-center">
                     Action
                 </th>
@@ -264,8 +264,8 @@
                                                 <div class="flex flex-wrap gap-4 justify-center">
                                                     @foreach ($pesanan as $item)
                                                         <a class="bg-gray-100 flex-grow text-black border-l-8 border-green-500 rounded-md px-3 py-4 w-full md:w-5/12 lg:w-3/12">
-                                                            <h3 class="text-lg font-medium text-gray-900">{{ $item['no_kamar'] }}</h3>
-                                                            <p class="mt-1 text-sm text-gray-500">{{ $item['jenisKamar'] }}</p>
+                                                            <h3 class="text-lg font-medium text-gray-900">{{ $item['jenisKamar'] }}</h3>
+                                                            {{-- <p class="mt-1 text-sm text-gray-500">{{ $item['jenisKamar'] }}</p> --}}
                                                             
                                                             <div class="text-sm font-thin text-gray-500 pt-2">
                                                                 <p>Harga Kamar: 
@@ -315,8 +315,10 @@
                                                         </a>
                                                     @endforeach
                                                 </div>
+
+
                                             </div>
-                                            
+
 
                         
                                         </div>
@@ -332,7 +334,7 @@
                                                         <span class="text-sm text-gray-600">Harga Awal :</span>
                                                         @foreach ($hargaDasarList as $noKamar => $harga)
                                                             <div class="mt-1 text-sm text-gray-900">
-                                                                #{{ $loop->iteration }} Kamar: {{ $noKamar }} - Rp {{ number_format($harga, 0, ',', '.') }}
+                                                                 Rp {{ number_format($harga, 0, ',', '.') }}
                                                                 @if ($item['persentase_diskon'] && $item['persentase_kenaikan_harga'])
                                                                 <p>Diskon: 
                                                                     <span class="text-red-600">{{ '-'.$item['persentase_diskon'].'%' }}</span>
@@ -365,7 +367,7 @@
                                                         <span class="text-sm text-gray-600">Harga Akhir :</span>
                                                         @foreach ($hargaAkhirList as $noKamar => $hargaAkhir)
                                                             <div class="mt-1 text-sm text-gray-900">
-                                                                #{{ $loop->iteration }} Kamar: {{ $noKamar }} - Rp {{ number_format($hargaAkhir, 0, ',', '.') }}
+                                                                 Rp {{ number_format($hargaAkhir, 0, ',', '.') }}
                                                             </div>
                                                         @endforeach
                                                     </div>
@@ -429,11 +431,6 @@
                                                             </div>
                                                         @endif
                                                         
-                                                        <div class="pt-2 border-t border-gray-100">
-                                                            <div class="flex justify-between items-center">
-                                                                <span class="text-xs text-gray-500">Transaksi. {{ $user ?? 'System' }}</span>
-                                                            </div>
-                                                        </div>
                                                     </div>
                                                 </div>
 
@@ -443,6 +440,53 @@
 
                                         </div>
                                     </div>
+
+
+
+
+                                    @if ($status_reservasi != "dipesan")
+                                        <div class="bg-white p-2 rounded-xl shadow-md border-t-2 border-blue-400">
+                                            <h4 class="text-sm p-2 font-semibold text-gray-500 mb-4">Nomor Kamar</h4>
+                                        
+
+                                            <div class="grid gap-3  grid-cols-1 md:grid-cols-2 lg:grid-cols-3" id="accordion-collapse-body-1">
+                                                
+
+
+
+                                                @forelse ($nomorKamar as $kamar)
+                                                        <a href="#"
+                                                            class="flex border items-center rounded-md cursor-pointer transition duration-500 shadow-sm hover:shadow-md hover:shadow-blue-400">
+                                                            <div class="p-2">
+                                                                <p class="font-semibold text-gray-600 text-md">{{ $kamar['no_kamar'] }}</p>
+                                                                <span class="text-xs text-gray-600">{{ $kamar['status_no_kamar'] ? 'sedang digunakan' : ''; }}</span>
+                                                            </div>
+                                                        </a>
+                                                    @empty
+                                                        <a href="#"
+                                                        class="flex border items-center rounded-md cursor-pointer transition duration-500 shadow-sm hover:shadow-md hover:shadow-blue-400">
+                                                        <div class="p-2">
+                                                            <p class="font-semibold text-gray-600 text-md">Nomor Kamar Belum dipilih</p>
+                                                        </div>
+                                                    </a>
+                                                    
+                                                @endforelse
+
+
+
+
+
+                                                
+                                        
+                                            
+
+                                                
+                                        
+                                            </div>
+
+                                        </div>
+                                    @endif
+                                
                         
                                         <div class="bg-yellow-50 p-4 rounded-xl border border-yellow-100">
                                             <div class="flex items-start gap-3">
@@ -778,8 +822,8 @@
                                                 <div class="flex flex-wrap gap-4 justify-center">
                                                     @foreach ($pesanan as $item)
                                                         <a class="bg-gray-100 flex-grow text-black border-l-8 border-green-500 rounded-md px-3 py-4 w-full md:w-5/12 lg:w-3/12">
-                                                            <h3 class="text-lg font-medium text-gray-900">{{ $item['no_kamar'] }}</h3>
-                                                            <p class="mt-1 text-sm text-gray-500">{{ $item['jenisKamar'] }}</p>
+                                                            <h3 class="text-lg font-medium text-gray-900">{{ $item['jenisKamar'] }}</h3>
+                                                            {{-- <p class="mt-1 text-sm text-gray-500">{{ $item['jenisKamar'] }}</p> --}}
                                                             
                                                             <div class="text-sm font-thin text-gray-500 pt-2">
                                                                 <p>Harga Kamar: 
@@ -846,7 +890,7 @@
                                                         <span class="text-sm text-gray-600">Harga Awal :</span>
                                                         @foreach ($hargaDasarList as $noKamar => $harga)
                                                             <div class="mt-1 text-sm text-gray-900">
-                                                                #{{ $loop->iteration }} Kamar: {{ $noKamar }} - Rp {{ number_format($harga, 0, ',', '.') }}
+                                                                Rp {{ number_format($harga, 0, ',', '.') }}
                                                                 @if ($item['persentase_diskon'] && $item['persentase_kenaikan_harga'])
                                                                 <p>Diskon: 
                                                                     <span class="text-red-600">{{ '-'.$item['persentase_diskon'].'%' }}</span>
@@ -879,7 +923,7 @@
                                                         <span class="text-sm text-gray-600">Harga Akhir :</span>
                                                         @foreach ($hargaAkhirList as $noKamar => $hargaAkhir)
                                                             <div class="mt-1 text-sm text-gray-900">
-                                                                #{{ $loop->iteration }} Kamar: {{ $noKamar }} - Rp {{ number_format($hargaAkhir, 0, ',', '.') }}
+                                                               Rp {{ number_format($hargaAkhir, 0, ',', '.') }}
                                                             </div>
                                                         @endforeach
                                                     </div>
@@ -925,7 +969,7 @@
                                                             </span>
                                                         </div>
                                                         <div class="flex justify-end gap-3 mt-10">
-                                                            <button type="button" wire:click="$set('showModalCheckIn', false)" 
+                                                            <button type="button" wire:click="tutupCheckIn()" 
                                                             class="px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 
                                                             focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
                                                             Batal
@@ -943,6 +987,104 @@
 
                                            
 
+                                        </div>
+                                    </div>
+
+
+
+
+                                    <div class="bg-white p-2 rounded-xl shadow-md border-t-2 border-blue-400">
+                                        <h4 class="text-sm p-2 font-semibold text-gray-500 mb-4">Pilih Nomor Kamar</h4>
+                                        
+                                        <div class="grid gap-3 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+                                            @foreach($nomorKamar as $kamar)
+                                            <div x-data="{ 
+                                                isOccupied: {{ $kamar['status_no_kamar'] ? 'true' : 'false' }},
+                                                isLoading: false,
+                                                isBooked: {{ $kamar['status_pemesanan'] ? 'true' : 'false' }}
+                                            }" 
+                                            class="relative transition-transform duration-200 hover:scale-[1.02]">
+                                                <label :class="{
+                                                    'shadow-md shadow-blue-400': isOccupied,
+                                                    'border hover:shadow-md hover:shadow-blue-200': !isOccupied,
+                                                    'shadow-md shadow-green-400 cursor-not-allowed': isBooked,
+                                                    'shadow-md shadow-yellow-400 cursor-pointer': isOccupied && isBooked
+                                                }"
+                                                
+                                                class="flex border items-center rounded-md transition duration-500 bg-white h-full"
+                                                        :disabled="isOccupied == false && isBooked == true"
+                                                        title="Klik untuk mengatur nomor kamar" >
+                                                    
+                                                    <input 
+                                                        type="checkbox" 
+                                                        value="{{ $kamar['no_kamar'] . $kamar['status_pemesanan'] }}"
+                                                        :disabled="isOccupied == false && isBooked == true"
+                                                        @change="
+                                                            isLoading = true;
+                                                            fetch('/resepsionis/kamar/update-status', {
+                                                                method: 'POST',
+                                                                headers: {
+                                                                    'Content-Type': 'application/json',
+                                                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                                                },
+                                                                body: JSON.stringify({
+                                                                    id_pesanan: '{{ $kamar['id_pesanan'] }}',
+                                                                    no_kamar: '{{ $kamar['no_kamar'] }}',
+                                                                    status: !isOccupied
+                                                                })
+                                                            })
+                                                            .then(async response => {
+                                                                const contentType = response.headers.get('content-type');
+                                                                const isJson = contentType && contentType.includes('application/json');
+                                                                const data = isJson ? await response.json() : await response.text();
+                                                                
+                                                                if (!response.ok) {
+                                                                    throw new Error(isJson ? data.message : `Server error: ${data}`);
+                                                                }
+                                                                return data;
+                                                            })
+                                                            .then(data => {
+                                                                isOccupied = !isOccupied;
+                                                                $dispatch('notify', {title: 'success', message: data.message});
+                                                            })
+                                                            .catch(error => {
+                                                                console.error('Error:', error);
+                                                                $dispatch('notify', {title: 'fail', message: error.message});
+                                                                isOccupied = false;
+                                                            })
+                                                            .finally(() => isLoading = false)
+                                                        "
+                                                        :checked="isOccupied"
+                                                        :disabled="isLoading"
+                                                        class="hidden"
+                                                    >
+                                                    
+                                                    <div class="p-2 w-full">
+                                                        <div class="flex justify-between items-center">
+                                                            <p class="font-semibold text-gray-600 text-md">{{ $kamar['no_kamar'] }}</p>
+                                                            
+                                                            <!-- Status Indicator -->
+                                                            <span class="text-xs font-medium" 
+                                                                :class="{
+                                                                    'text-blue-400': isOccupied,
+                                                                    'text-gray-400': !isOccupied,
+                                                                    'text-yellow-400': isOccupied && isBooked
+                                                                }">
+                                                                <span x-text="isOccupied && isBooked ? 'Terjadi Bentrok' : (isBooked ? 'Terisi' : (isOccupied ? 'Dipesan' : 'Tersedia'))"></span>
+                                                            </span>
+                                                        </div>
+                                                        
+                                                        <!-- Loading Spinner -->
+                                                        <div x-show="isLoading" class="mt-1 flex justify-end">
+                                                            <svg class="animate-spin h-4 w-4 text-blue-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                            </svg>
+                                                        </div>
+                                                    </div>
+                                                </label>
+                                            </div>
+                                            @endforeach
                                         </div>
                                     </div>
                         
@@ -1051,8 +1193,8 @@
                                                 <div class="flex flex-wrap gap-4 justify-center">
                                                     @foreach ($pesanan as $item)
                                                         <a class="bg-gray-100 flex-grow text-black border-l-8 border-green-500 rounded-md px-3 py-4 w-full md:w-5/12 lg:w-3/12">
-                                                            <h3 class="text-lg font-medium text-gray-900">{{ $item['no_kamar'] }}</h3>
-                                                            <p class="mt-1 text-sm text-gray-500">{{ $item['jenisKamar'] }}</p>
+                                                            <h3 class="text-lg font-medium text-gray-900">{{ $item['jenisKamar'] }}</h3>
+                                                            {{-- <p class="mt-1 text-sm text-gray-500">{{ $item['jenisKamar'] }}</p> --}}
                                                             
                                                             <div class="text-sm font-thin text-gray-500 pt-2">
                                                                 <p>Harga Kamar: 
@@ -1103,8 +1245,47 @@
                                                     @endforeach
                                                 </div>
                                             </div>
+
+
+
+
+                                                  
+                                            <div class="bg-white p-2 rounded-xl shadow-md border-t-2 border-blue-400">
+                                                <h4 class="text-sm p-2 font-semibold text-gray-500 mb-4">Nomor Kamar</h4>
                                             
 
+                                                <div class="grid gap-3  grid-cols-1 md:grid-cols-2 lg:grid-cols-3" id="accordion-collapse-body-1">
+                                            
+                                                    @forelse ($nomorKamar as $kamar)
+                                                        
+                                                        <div class="bg-gray-100 rounded flex p-4 h-full items-center">
+                                                            <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                                                class="text-indigo-500 w-6 h-6 flex-shrink-0 mr-4" viewBox="0 0 24 24">
+                                                                <path d="M22 11.08V12a10 10 0 11-5.93-9.14"></path>
+                                                                <path d="M22 4L12 14.01l-3-3"></path>
+                                                            </svg>
+                                                            <span class="font-medium text-gray-800">{{ $kamar['no_kamar'] }}</span>
+                                                        </div>
+                                                    @empty
+                                                        
+                                                    <div class="bg-gray-100 rounded flex p-4 h-full items-center">
+                                                        <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                                            class="text-indigo-500 w-6 h-6 flex-shrink-0 mr-4" viewBox="0 0 24 24">
+                                                            <path d="M22 11.08V12a10 10 0 11-5.93-9.14"></path>
+                                                            <path d="M22 4L12 14.01l-3-3"></path>
+                                                        </svg>
+                                                        <span class="font-medium text-gray-800">Kamar Belum dipilih</span>
+                                                    </div>
+                                                    @endforelse
+                                                    
+                                                    
+                                                    
+                                            
+                                                </div>
+
+                                            </div>
+                                   
+                                            
                         
                                         </div>
                         
@@ -1119,7 +1300,7 @@
                                                         <span class="text-sm text-gray-600">Harga Awal :</span>
                                                         @foreach ($hargaDasarList as $noKamar => $harga)
                                                             <div class="mt-1 text-sm text-gray-900">
-                                                                #{{ $loop->iteration }} Kamar: {{ $noKamar }} - Rp {{ number_format($harga, 0, ',', '.') }}
+                                                                Rp {{ number_format($harga, 0, ',', '.') }}
                                                                 @if ($item['persentase_diskon'] && $item['persentase_kenaikan_harga'])
                                                                 <p>Diskon: 
                                                                     <span class="text-red-600">{{ '-'.$item['persentase_diskon'].'%' }}</span>
@@ -1152,7 +1333,7 @@
                                                         <span class="text-sm text-gray-600">Harga Akhir :</span>
                                                         @foreach ($hargaAkhirList as $noKamar => $hargaAkhir)
                                                             <div class="mt-1 text-sm text-gray-900">
-                                                                #{{ $loop->iteration }} Kamar: {{ $noKamar }} - Rp {{ number_format($hargaAkhir, 0, ',', '.') }}
+                                                                 Rp {{ number_format($hargaAkhir, 0, ',', '.') }}
                                                             </div>
                                                         @endforeach
                                                     </div>
@@ -1220,7 +1401,12 @@
                                            
 
                                         </div>
+                                        
                                     </div>
+
+
+
+
 
 
 

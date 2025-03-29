@@ -17,7 +17,6 @@
                     <label for="status_kamar" class="label">Status Kamar</label>
                     <select id="status_kamar"  wire:model="form.status_kamar"  required class="select select-bordered w-full border-gray-100 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" required>
                         <option value="tersedia" selected>Tersedia</option>
-                        <option value="terisi">Terisi</option>
                         <option value="perbaikan">Perbaikan</option>
                     </select>
                     <x-input-form-error for="form.status_kamar" class="mt-1" />

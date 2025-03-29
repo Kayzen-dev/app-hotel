@@ -54,7 +54,7 @@
                             @endif
                         </td>
                         
-                        <td  class="text-center" >{{ $item->kamar_count }}</td>
+                        <td  class="text-center" >{{ $item->total_kamar }}</td>
 
                         <td class="text-center">
                             <x-button @click="$dispatch('dispatch-jenis-kamar-table-edit', { id: '{{ $item->id }}' })"
