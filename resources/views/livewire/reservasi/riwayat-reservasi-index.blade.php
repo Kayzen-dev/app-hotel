@@ -107,7 +107,7 @@
         </x-dialog-modal>
     </div>
 
-
+    
 
     <x-dialog wire:model="showModalDetail" maxWidth="2xl">
         <x-slot name="title">
@@ -286,10 +286,8 @@
                             </div>
 
 
-                            {{-- Nomor Kamar yang tersedia --}}
-
                         </div>
-                        
+
 
     
                     </div>
@@ -305,7 +303,7 @@
                                     <span class="text-sm text-gray-600">Harga Awal :</span>
                                     @foreach ($hargaDasarList as $noKamar => $harga)
                                         <div class="mt-1 text-sm text-gray-900">
-                                            #{{ $loop->iteration }} Kamar: {{ $noKamar }} - Rp {{ number_format($harga, 0, ',', '.') }}
+                                             Rp {{ number_format($harga, 0, ',', '.') }}
                                             @if ($item['persentase_diskon'] && $item['persentase_kenaikan_harga'])
                                             <p>Diskon: 
                                                 <span class="text-red-600">{{ '-'.$item['persentase_diskon'].'%' }}</span>
@@ -338,7 +336,7 @@
                                     <span class="text-sm text-gray-600">Harga Akhir :</span>
                                     @foreach ($hargaAkhirList as $noKamar => $hargaAkhir)
                                         <div class="mt-1 text-sm text-gray-900">
-                                            #{{ $loop->iteration }} Kamar: {{ $noKamar }} - Rp {{ number_format($hargaAkhir, 0, ',', '.') }}
+                                             Rp {{ number_format($hargaAkhir, 0, ',', '.') }}
                                         </div>
                                     @endforeach
                                 </div>
@@ -402,11 +400,6 @@
                                         </div>
                                     @endif
                                     
-                                    <div class="pt-2 border-t border-gray-100">
-                                        <div class="flex justify-between items-center">
-                                            <span class="text-xs text-gray-500">Transaksi. {{ $user ?? 'System' }}</span>
-                                        </div>
-                                    </div>
                                 </div>
                             </div>
 
@@ -416,6 +409,53 @@
 
                     </div>
                 </div>
+
+
+
+
+                @if ($status_reservasi != "dipesan")
+                    <div class="bg-white p-2 rounded-xl shadow-md border-t-2 border-blue-400">
+                        <h4 class="text-sm p-2 font-semibold text-gray-500 mb-4">Nomor Kamar</h4>
+                    
+
+                        <div class="grid gap-3  grid-cols-1 md:grid-cols-2 lg:grid-cols-3" id="accordion-collapse-body-1">
+                            
+
+
+
+                            @forelse ($nomorKamar as $kamar)
+                                    <a href="#"
+                                        class="flex border items-center rounded-md cursor-pointer transition duration-500 shadow-sm hover:shadow-md hover:shadow-blue-400">
+                                        <div class="p-2">
+                                            <p class="font-semibold text-gray-600 text-md">{{ $kamar['no_kamar'] }}</p>
+                                            <span class="text-xs text-gray-600">{{ $kamar['status_no_kamar'] ? 'sedang digunakan' : ''; }}</span>
+                                        </div>
+                                    </a>
+                                @empty
+                                    <a href="#"
+                                    class="flex border items-center rounded-md cursor-pointer transition duration-500 shadow-sm hover:shadow-md hover:shadow-blue-400">
+                                    <div class="p-2">
+                                        <p class="font-semibold text-gray-600 text-md">Nomor Kamar Belum dipilih</p>
+                                    </div>
+                                </a>
+                                
+                            @endforelse
+
+
+
+
+
+                            
+                    
+                        
+
+                            
+                    
+                        </div>
+
+                    </div>
+                @endif
+            
     
                     <div class="bg-yellow-50 p-4 rounded-xl border border-yellow-100">
                         <div class="flex items-start gap-3">
@@ -454,6 +494,10 @@
 
 
 
+
+
+
+
     <x-dialog wire:model="showModalInvoice" maxWidth="2xl">
         <x-slot name="title">
             <div class="flex items-center gap-3 px-6 pt-4">
@@ -473,7 +517,7 @@
                         <div class="flex items-center justify-between mb-8">
                             <div class="flex items-center">
                                 <img class="h-20 w-20 mr-2" src="{{ asset('images/logo_hotel.png') }}" alt="Logo" />
-                                <div class="text-gray-700 font-semibold text-lg">Hotel Crown Pangandaran Syariah</div>
+                                <div class="text-gray-700 font-semibold text-lg">Crown Hotel Pangandaran Syariah</div>
                             </div>
                             <div class="text-gray-700 text-right">
                                 <div class="font-bold text-xl mb-2">INVOICE</div>
@@ -484,9 +528,9 @@
                     
                         <div class="grid grid-cols-2 gap-4 mb-6">
                             <div>
-                                <h3 class="font-bold text-gray-700">Hotel Crown Pangandaran Syariah</h3>
+                                <h3 class="font-bold text-gray-700">Crown Hotel Pangandaran Syariah</h3>
                                 <p class="text-gray-600 text-sm">
-                                    Jl. Pangandaran No. 10, Jawa Barat<br>
+                                    Jl Kidang Pananjung, Pangandaran No. 88, Jawa Barat<br>
                                     Email: crownhotelpangandaran1@gmail.com<br>
                                     Telp: (0858) 05362620
                                 </p>
@@ -533,18 +577,39 @@
                             <!-- Bagian Kiri: Informasi Kamar & Pembayaran -->
                             <div class="flex-1">
                                 <table class="w-full">
-                                    <tr>
-                                        <th class="p-2 text-gray-600 text-sm font-normal w-1/2">Total Kamar:</th>
-                                        <td class="p-2 text-gray-900 font-semibold text-right">{{ $jumlahKamar}}</td>
-                                    </tr>
-                                    <tr>
-                                        <th class="p-2 text-gray-600 text-sm font-normal">Jumlah Pembayaran:</th>
-                                        <td class="p-2 text-gray-900 font-semibold text-right">Rp {{ number_format($jumlahPembayaran, 0, ',', '.') }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th class="p-2 text-gray-600 text-sm font-normal">Kembalian:</th>
-                                        <td class="p-2 text-gray-900 font-semibold text-right">Rp {{ number_format($kembalian, 0, ',', '.') }}</td>
-                                    </tr>
+                                    @if ($status_reservasi == "Check in")
+                                        <tr>
+                                            <th class="p-2 text-gray-600 text-sm font-normal w-1/2">Total Kamar:</th>
+                                            <td class="p-2 text-gray-900 font-semibold text-right">{{ $jumlahKamar }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th class="p-2 text-gray-600 text-sm font-normal">Jumlah Pembayaran:</th>
+                                            <td class="p-2 text-gray-900 font-semibold text-right">Rp {{ number_format($jumlahPembayaran, 0, ',', '.') }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th class="p-2 text-gray-600 text-sm font-normal">Kembalian:</th>
+                                            <td class="p-2 text-gray-900 font-semibold text-right">Rp {{ number_format($kembalian, 0, ',', '.') }}</td>
+                                        </tr>
+                                    @elseif ($status_reservasi == "Check out")
+                                        <tr>
+                                            <th class="p-2 text-gray-600 text-sm font-normal w-1/2">Total Kamar:</th>
+                                            <td class="p-2 text-gray-900 font-semibold text-right">{{ $jumlahKamar}}</td>
+                                        </tr>
+                                        <tr>
+                                            <th class="p-2 text-gray-600 text-sm font-normal">Jumlah Pembayaran:</th>
+                                            <td class="p-2 text-gray-900 font-semibold text-right">Rp {{ number_format($jumlahPembayaran, 0, ',', '.') }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th class="p-2 text-gray-600 text-sm font-normal">Kembalian:</th>
+                                            <td class="p-2 text-gray-900 font-semibold text-right">Rp {{ number_format($kembalian, 0, ',', '.') }}</td>
+                                        </tr>
+                                    @else
+                                        <tr>
+                                            <th class="p-2 text-gray-600 text-sm font-normal w-1/2">Total Kamar:</th>
+                                            <td class="p-2 text-gray-900 font-semibold text-right">{{ $jumlahKamar}}</td>
+                                        </tr>
+                                        
+                                    @endif
                                 </table>
                             </div>
                         
@@ -554,14 +619,26 @@
                             <!-- Bagian Kanan: Total & Denda -->
                             <div class="flex-1">
                                 <table class="w-full">
-                                    <tr>
-                                        <th class="p-2 text-gray-900 font-bold pt-3">Total:</th>
-                                        <td class="p-2 text-red-600 font-bold text-right pt-3">Rp {{ number_format($total_harga, 0, ',', '.') }}</td>
-                                    </tr>
-                                    <tr class="border-t border-gray-200">
-                                        <th class="p-2 text-gray-600 text-sm font-normal">Denda:</th>
-                                        <td class="p-2 text-gray-900 font-semibold text-right">Rp {{ number_format($denda, 0, ',', '.') }}</td>
-                                    </tr>
+                                    @if ($status_reservasi == "Check in")
+                                        <tr class="border-t border-gray-200">
+                                            <th class="p-2 text-gray-900 font-bold pt-3">Total:</th>
+                                            <td class="p-2 text-red-600 font-bold text-right pt-3">Rp {{ number_format($total_harga, 0, ',', '.') }}</td>
+                                        </tr>
+                                    @elseif ($status_reservasi == "Check out")
+                                        <tr>
+                                            <th class="p-2 text-gray-900 font-bold pt-3">Total:</th>
+                                            <td class="p-2 text-red-600 font-bold text-right pt-3">Rp {{ number_format($total_harga, 0, ',', '.') }}</td>
+                                        </tr>
+                                        <tr class="border-t border-gray-200">
+                                            <th class="p-2 text-gray-600 text-sm font-normal">Denda:</th>
+                                            <td class="p-2 text-gray-900 font-semibold text-right">Rp {{ number_format($denda, 0, ',', '.') }}</td>
+                                        </tr>
+                                    @else
+                                        <tr class="border-t border-gray-200">
+                                            <th class="p-2 text-gray-900 font-bold pt-3">Total:</th>
+                                            <td class="p-2 text-red-600 font-bold text-right pt-3">Rp {{ number_format($total_harga, 0, ',', '.') }}</td>
+                                        </tr>
+                                    @endif
                                 </table>
                             </div>
                         </div>
@@ -596,7 +673,6 @@
             </div>
         </x-slot>
     </x-dialog>
-
 
 
 

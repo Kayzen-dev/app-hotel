@@ -117,7 +117,7 @@
                         <div>
                             <x-dialog-modal wire:model.live="showModalSelesai"> 
                                 <x-slot name="title">
-                                    Batalkan Data Reservasi
+                                    Selesaikan Reservasi
                                 </x-slot>
                             
                                 <x-slot name="content">
@@ -529,11 +529,6 @@
 
 
 
-
-
-
-
-
                         <x-dialog wire:model="showModalInvoice" maxWidth="2xl">
                             <x-slot name="title">
                                 <div class="flex items-center gap-3 px-6 pt-4">
@@ -564,7 +559,7 @@
                                         
                                             <div class="grid grid-cols-2 gap-4 mb-6">
                                                 <div>
-                                                    <h3 class="font-bold text-gray-700">Hotel Crown Pangandaran Syariah</h3>
+                                                    <h3 class="font-bold text-gray-700">Crown Hotel Pangandaran Syariah</h3>
                                                     <p class="text-gray-600 text-sm">
                                                         Jl Kidang Pananjung, Pangandaran No. 88, Jawa Barat<br>
                                                         Email: crownhotelpangandaran1@gmail.com<br>
