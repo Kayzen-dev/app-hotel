@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Laporan Pendapatan Hotel Crown</title>
+    <title>Laporan Pendapatan Crown Hotel</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @media print {
@@ -65,9 +65,9 @@
                 <div class="flex items-center">
                     <img class="h-16 w-16 mr-4" src="{{ asset('images/logo_hotel.png') }}" alt="Logo Hotel">
                     <div>
-                        <h1 class="text-2xl font-bold">Hotel Crown Pangandaran Syariah</h1>
+                        <h1 class="text-2xl font-bold">Crown Hotel Pangandaran Syariah</h1>
                         <p class="text-sm text-gray-600 mt-1">
-                            Jl. Pangandaran No. 10, Jawa Barat<br>
+                            Jl Kidang Pananjung, Pangandaran No. 88, Jawa Barat<br>
                             Email: crownhotelpangandaran1@gmail.com<br>
                             Telp: (0858) 05362620
                         </p>
@@ -153,7 +153,7 @@
                 <div class="text-sm text-gray-700">
                     Manager Hotel<br>
                     <br><br><br>
-                    {{ Auth::user()->name }}
+                     ----------
 
                 </div>
             </div>
