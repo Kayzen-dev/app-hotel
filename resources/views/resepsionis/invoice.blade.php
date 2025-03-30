@@ -174,7 +174,7 @@
                 <div class="text-sm text-gray-700">
                     Manajement Hotel<br>
                     <br><br><br>
-                    --------
+                    ----------------------
                 </div>
             </div>
         </div>
