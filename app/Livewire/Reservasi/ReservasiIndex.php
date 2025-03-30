@@ -559,7 +559,13 @@ class ReservasiIndex extends Component
             //     'jumlahMAc' => $jumlahKamarMax,
             //     'test' => $jumlahKamarDipesan != $jumlahKamarMax
             // ]);
-
+            
+             foreach ($this->nomorKamar as $item) {
+                if ($item['status_no_kamar'] == 1 && $item['status_pemesanan'] == 1) {
+                    $this->dispatch('notify', title: 'fail', message: 'Kamar Ada yang bentrok !');
+                    return;
+                }
+            }
 
             if ($jumlahKamarDipesan != $jumlahKamarMax) {
                 # code...
