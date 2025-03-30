@@ -620,10 +620,12 @@ class ReservasiIndex extends Component
                     ? $this->dispatch('notify', title: 'fail', message: 'Check In dan Pembayaran gagal dilakukan')
                     : $this->dispatch('notify', title: 'success', message: 'Check In dan  Pembayaran berhasil dilakukan');
                     $this->showModalCheckIn = false;
+                    return;
                 
                 }else{
                     $this->dispatch('notify', title: 'fail', message: 'Pembayaran gagal!');
                     $this->showModalCheckIn = false;
+                    return;
                 }
 
         }
