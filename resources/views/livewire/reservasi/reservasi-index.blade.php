@@ -553,7 +553,7 @@
                                             <div class="flex items-center justify-between mb-8">
                                                 <div class="flex items-center">
                                                     <img class="h-20 w-20 mr-2" src="{{ asset('images/logo_hotel.png') }}" alt="Logo" />
-                                                    <div class="text-gray-700 font-semibold text-lg">Hotel Crown Pangandaran Syariah</div>
+                                                    <div class="text-gray-700 font-semibold text-lg">Crown Hotel Pangandaran Syariah</div>
                                                 </div>
                                                 <div class="text-gray-700 text-right">
                                                     <div class="font-bold text-xl mb-2">INVOICE</div>
@@ -566,7 +566,7 @@
                                                 <div>
                                                     <h3 class="font-bold text-gray-700">Hotel Crown Pangandaran Syariah</h3>
                                                     <p class="text-gray-600 text-sm">
-                                                        Jl. Pangandaran No. 10, Jawa Barat<br>
+                                                        Jl Kidang Pananjung, Pangandaran No. 88, Jawa Barat<br>
                                                         Email: crownhotelpangandaran1@gmail.com<br>
                                                         Telp: (0858) 05362620
                                                     </p>
