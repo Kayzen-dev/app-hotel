@@ -12,9 +12,6 @@
                 background: white !important;
                 -webkit-print-color-adjust: exact; 
             }
-            .print-bg {
-                background-color: #f8fafc !important;
-            }
         }
         .watermark {
             opacity: 0.1;
@@ -33,32 +30,32 @@
         
         // Set timeout untuk redirect setelah 1 detik
         const redirectTimer = setTimeout(() => {
-            window.location.href = "{{ route('resepsionis.reservasi.data') }}";
+            window.location.href = "{{ route('resepsionis.laporan.index') }}";
         }, 1000);
 
         // Handler setelah print selesai
         window.onafterprint = function() {
             clearTimeout(redirectTimer); // Batalkan timeout jika print dialog sudah ditutup
             setTimeout(() => {
-                window.location.href = "{{ route('resepsionis.reservasi.data') }}";
+                window.location.href = "{{ route('resepsionis.laporan.index') }}";
             }, 500); // Beri sedikit delay setelah menutup dialog print
         };
     };
 
     // Fallback untuk browser yang tidak support onafterprint
     window.addEventListener('afterprint', function() {
-        window.location.href = "{{ route('resepsionis.reservasi.data') }}";
+        window.location.href = "{{ route('resepsionis.laporan.index') }}";
     });
 </script>
 </head>
-<body class="bg-gray-50 p-8">
+<body class="p-8">
     <!-- Watermark -->
     <div class="watermark">
         <img src="{{ asset('images/logo_hotel.png') }}" class="h-64 w-64 opacity-20" alt="Watermark">
     </div>
 
     <!-- Container Utama -->
-    <div class="max-w-4xl mx-auto rounded-lg overflow-hidden print-bg">
+    <div class="max-w-4xl mx-auto rounded-lg overflow-hidden">
         <!-- Header -->
         <div class="p-6">
             <div class="flex items-center justify-between">

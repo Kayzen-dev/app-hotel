@@ -16,6 +16,7 @@ class LaporanIndex extends Component
     public $tanggalSelesai;
     public $totalPendapatan = 0;
     public $totalReservasi = 0;
+    public $totalDenda = 0;
     public $pendapatanPerJenisKamar = [];
 
     protected $rules = [
@@ -59,6 +60,12 @@ class LaporanIndex extends Component
             })
             ->sum('total_harga');
 
+        $this->totalDenda = Reservasi::where('status_reservasi', 'selesai')
+            ->where(function ($query) {
+                $this->applyDateFilter($query);
+            })
+            ->sum('denda');
+
             $this->pendapatanPerJenisKamar = Reservasi::select(
                 'jenis_kamar.tipe_kamar',
                 DB::raw('SUM(reservasi.jumlah_kamar * pesanan.harga_akhir * pesanan.jumlah_malam) as total')
@@ -94,7 +101,7 @@ class LaporanIndex extends Component
                 $this->applyDateFilter($query);
             })
             ->orderBy('tanggal_check_out', 'desc')
-            ->paginate(10);
+            ->get();
 
         return view('livewire.laporan.laporan-index', [
             'data' => $data,
