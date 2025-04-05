@@ -33,38 +33,7 @@ Route::get('/guest', function(){
 Route::middleware(['auth','verified','proses'])->group(function(){
 
     Route::get('/pemilik', function () {
-        $today = now()->format('Y-m-d');
-        
-        $data = [
-            // Statistik Utama
-            'totalKamar' => Kamar::count(),
-            'kamarTersedia' => Kamar::where('status_kamar', 'tersedia')->count(),
-            'reservasiHariIni' => Reservasi::whereDate('tanggal_check_in', $today)->count(),
-            'tamuCheckIn' => Reservasi::whereDate('tanggal_check_in', $today)
-                              ->where('status_reservasi', 'check_in')->count(),
-            
-            // Data Terkini
-            'reservasiTerbaru' => Reservasi::with('tamu')
-                                    ->orderBy('created_at', 'desc')
-                                    ->take(5)
-                                    ->get(),
-            'keluhanAktif' => Keluhan::where('status_keluhan', 'diproses')
-                               ->orderBy('created_at', 'desc')
-                               ->take(5)
-                               ->get(),
-            
-            // Statistik Tambahan
-            'totalDiskonAktif' => Diskon::where('tanggal_mulai', '<=', $today)
-                                  ->where('tanggal_berakhir', '>=', $today)
-                                  ->count(),
-            'kamarPerbaikan' => Kamar::where('status_kamar', 'perbaikan')->count(),
-            'occupancyRate' => round((Reservasi::whereDate('tanggal_check_in', $today)
-                                    ->count() / Kamar::count()) * 100, 2),
-            'totalPendapatanHariIni' => Pembayaran::whereDate('created_at', $today)
-                                        ->sum('jumlah_pembayaran')
-        ];
-    
-        return view('pemilik.index', $data);
+        return view('pemilik.index');
     })->middleware('role:pemilik')->name('pemilik');
 
 
