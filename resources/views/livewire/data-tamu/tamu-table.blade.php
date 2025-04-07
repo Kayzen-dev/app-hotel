@@ -2,7 +2,12 @@
         
     {{-- @dd($data) --}}
 
-    <h2 class="text-2xl m-5 font-semibold text-gray-700 dark:text-white">Data Tamu</h2>
+    <div class="flex justify-between">
+        <h2 class="text-2xl m-5 font-semibold text-gray-700 dark:text-white">Data Tamu</h2>
+        <div>
+            <x-input wire:model.live="form.nama" type="search" placeholder="Cari Nama Tamu" class="w-full text-sm" />
+        </div>
+    </div>
 
 
     <div class="overflow-x-auto">
@@ -25,7 +30,6 @@
 
             </tr>
 
-            </tr>
 
           </thead>
 

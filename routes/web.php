@@ -487,6 +487,9 @@ Route::middleware(['auth','verified','proses'])->group(function(){
             ->where('status_reservasi', 'selesai') // Filter status di luar grup tanggal
             ->get();
 
+
+            // dd($data);
+
             return view('Pdf.laporan', compact('data','end','start'));
         })->name('laporan.pdf');
         

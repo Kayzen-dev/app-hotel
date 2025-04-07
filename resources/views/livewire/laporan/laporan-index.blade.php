@@ -119,6 +119,7 @@
                         <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Nama Tamu</th>
                         <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Jumlah Kamar</th>
                         <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Kamar</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Keterangan</th>
                         <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Check-in</th>
                         <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Check-out</th>
                         <th class="px-4 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">Harga Kamar</th>
@@ -154,15 +155,16 @@
                                     </template>
                                 </div>
                             </td>
+                            <td class="px-4 py-4 text-sm text-gray-900 text-center" x-text="item.keterangan ?? '-'"></td>
                             <td class="px-4 py-4 text-sm text-gray-900 whitespace-nowrap" 
                                 x-text="formatDate(item.tanggal_check_in)"></td>
                             <td class="px-4 py-4 text-sm text-gray-900 whitespace-nowrap" 
                                 x-text="formatDate(item.tanggal_check_out)"></td>
-                            <td class="px-4 py-4 text-sm text-gray-900 text-right font-medium" 
+                            <td class="px-4 py-4 text-sm text-gray-900 text-right font-medium  whitespace-nowrap" 
                                 x-text="'Rp ' + numberFormat(item.total_harga)"></td>
                             <td class="px-4 py-4 text-sm text-red-600 text-right font-medium whitespace-nowrap" 
                                 x-text="'Rp ' + numberFormat(item.denda)"></td>
-                            <td class="px-4 py-4 text-sm text-gray-900 text-right font-semibold" 
+                            <td class="px-4 py-4 text-sm text-gray-900 text-right font-semibold whitespace-nowrap" 
                                 x-text="'Rp ' + numberFormat(Number(item.total_harga) + Number(item.denda))"></td>
                         </tr>
                     </template>

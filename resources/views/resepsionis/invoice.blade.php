@@ -172,7 +172,7 @@
         <div class="mt-8 pt-4 border-t-2 border-gray-200">
             <div class="flex justify-end items-center">
                 <div class="text-sm text-gray-700">
-                    Manajement Hotel<br>
+                    Management Hotel<br>
                     <br><br><br>
                     ----------------------
                 </div>
