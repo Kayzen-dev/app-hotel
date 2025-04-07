@@ -41,7 +41,6 @@
                         'start' => $tanggalMulai,
                         'end' => $tanggalSelesai
                     ]) }}" 
-                    target="_blank"
                     class="btn btn-neutral w-full"
                 >
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -105,7 +104,7 @@
 
 
 <div class="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden" 
-        x-data="transactionPaginate()" x-cloak>
+        x-data="transaksi()" x-cloak>
         <!-- Header Section -->
         <div class="p-6 border-b border-gray-200">
             <h3 class="text-xl font-bold text-gray-800">Detail Transaksi</h3>
@@ -256,48 +255,51 @@
         </div>
 </div>
 
+
+
 <script>
-document.addEventListener('alpine:init', () => {
-    Alpine.data('transactionPaginate', () => ({
-        currentPage: 1,
-        perPage: 5,
-        totalItems: {{ $data->count() }},
-        init() {
-            this.totalItems = this.transactions.length;
-            console.log(this.transactions[0]?.pesanan);
-        },
-        get transactions() {
-            return @json($data);
-        },
-        get totalPages() {
-            return Math.ceil(this.totalItems / this.perPage);
-        },
-        get paginatedData() {
-            const start = (this.currentPage - 1) * this.perPage;
-            const end = start + this.perPage;
-            return this.transactions.slice(start, end);
-        },
-        get pages() {
-            return Array.from({length: this.totalPages}, (_, i) => i + 1);
-        },
-        formatDate(dateString) {
-            const date = new Date(dateString);
-            return new Intl.DateTimeFormat('id-ID', {
-                day: 'numeric',
-                month: 'short',
-                year: 'numeric'
-            }).format(date);
-        },
-        numberFormat(number) {
-            return new Intl.NumberFormat('id-ID').format(number);
-        },
-        nextPage() {
-            if (this.currentPage < this.totalPages) this.currentPage++;
-        },
-        previousPage() {
-            if (this.currentPage > 1) this.currentPage--;
-        }
-    }));
-});
+    function transaksi (){
+        return {
+            currentPage: 1,
+            perPage: 5,
+            totalItems: {{ $data->count() }},
+            init() {
+                this.totalItems = this.transactions.length;
+                console.log(this.transactions[0]?.pesanan);
+            },
+            get transactions() {
+                return @json($data);
+            },
+            get totalPages() {
+                return Math.ceil(this.totalItems / this.perPage);
+            },
+            get paginatedData() {
+                const start = (this.currentPage - 1) * this.perPage;
+                const end = start + this.perPage;
+                return this.transactions.slice(start, end);
+            },
+            get pages() {
+                return Array.from({length: this.totalPages}, (_, i) => i + 1);
+            },
+            formatDate(dateString) {
+                const date = new Date(dateString);
+                return new Intl.DateTimeFormat('id-ID', {
+                    day: 'numeric',
+                    month: 'short',
+                    year: 'numeric'
+                }).format(date);
+            },
+            numberFormat(number) {
+                return new Intl.NumberFormat('id-ID').format(number);
+            },
+            nextPage() {
+                if (this.currentPage < this.totalPages) this.currentPage++;
+            },
+            previousPage() {
+                if (this.currentPage > 1) this.currentPage--;
+            }
+        };
+    }
 </script>
+
 </div>
