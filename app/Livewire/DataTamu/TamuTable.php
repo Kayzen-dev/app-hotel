@@ -16,7 +16,7 @@ class TamuTable extends Component
 
     public TamuForm $form;
 
-    public $paginate = 5; // Jumlah data per halaman
+    public $paginate = 10; // Jumlah data per halaman
     public $sortBy = 'tamu.id'; // Kolom default untuk pengurutan
     public $sortDirection = 'desc'; // Arah pengurutan default
 
@@ -32,6 +32,7 @@ class TamuTable extends Component
         [
             'data' =>  Tamu::with(['reservasi.pesanan.kamar.jenisKamar','reservasi.pembayaran'])
             ->withCount('reservasi')
+            ->where('nama', 'like', '%' . $this->form->nama . '%')
             ->orderBy($this->sortBy, $this->sortDirection)
             ->paginate($this->paginate),
         ]

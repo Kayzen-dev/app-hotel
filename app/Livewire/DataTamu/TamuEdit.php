@@ -34,7 +34,7 @@ class TamuEdit extends Component
             'kota' => $this->form->kota,
             'email' => $this->form->email,
             'jumlah_anak' => $this->form->jumlah_anak,
-            'jumlah_anak' => $this->form->jumlah_anak,
+            'jumlah_dewasa' => $this->form->jumlah_dewasa,
             'no_identitas' => $this->form->no_identitas,
         ]);
 

@@ -69,7 +69,10 @@ class TamuForm extends Form
         $tamu = Tamu::find($id);
 
         // $tamu->update([
-        //     'nama' => $nama;
+        //     'nama' => $this->nama,
+        //     'email' => $this->email,
+        //     'no_identitas' => $this->no_identitas,
+        //     ''
         // ]);
 
 
