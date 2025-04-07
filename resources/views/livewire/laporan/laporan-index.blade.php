@@ -160,7 +160,7 @@
                                 x-text="formatDate(item.tanggal_check_out)"></td>
                             <td class="px-4 py-4 text-sm text-gray-900 text-right font-medium" 
                                 x-text="'Rp ' + numberFormat(item.total_harga)"></td>
-                            <td class="px-4 py-4 text-sm text-red-600 text-right font-medium" 
+                            <td class="px-4 py-4 text-sm text-red-600 text-right font-medium whitespace-nowrap" 
                                 x-text="'Rp ' + numberFormat(item.denda)"></td>
                             <td class="px-4 py-4 text-sm text-gray-900 text-right font-semibold" 
                                 x-text="'Rp ' + numberFormat(Number(item.total_harga) + Number(item.denda))"></td>
